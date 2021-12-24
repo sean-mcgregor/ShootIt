@@ -122,7 +122,7 @@ public class RegisterActivity extends AppCompatActivity {
 //                                }
 //                            });
 
-                    mDatabase.child("users").child(userID).setValue(getUsername());
+                    mDatabase.child("users").child(userID).child("username").setValue(getUsername());
 
                     launchMainActivity();
                 } else {
