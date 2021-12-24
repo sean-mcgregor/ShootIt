@@ -21,12 +21,18 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
     // Initialize Firebase Auth
+    private FirebaseAuth mAuth;
+
+    private String username;
     private String email;
     private String password;
+    private String password2;
+
+    EditText usernameInput;
     EditText emailInput;
     EditText passwordInput;
+    EditText password2Input;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +41,10 @@ public class RegisterActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         final Button registerButton = findViewById(R.id.register_button);
         final Button loginButton = findViewById(R.id.login_button);
+        usernameInput = findViewById(R.id.usernameInput);
         emailInput = findViewById(R.id.emailInput);
         passwordInput = findViewById(R.id.passwordInput);
+        password2Input = findViewById(R.id.password2Input);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
 
@@ -74,8 +82,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void updateCredentials() {
 
+        setUsername(RegisterActivity.this.usernameInput.getText().toString());
         setEmail(RegisterActivity.this.emailInput.getText().toString());
         setPassword(RegisterActivity.this.passwordInput.getText().toString());
+        setPassword2(RegisterActivity.this.password2Input.getText().toString());
     }
 
 
@@ -114,6 +124,10 @@ public class RegisterActivity extends AppCompatActivity {
         startActivity(mainActivityLauncher);
     }
 
+    public String getUsername() { return username; }
+
+    public void setUsername(String username) { this.username = username; }
+
     public String getEmail() {
         return email;
     }
@@ -129,4 +143,8 @@ public class RegisterActivity extends AppCompatActivity {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public String getPassword2() { return password2; }
+
+    public void setPassword2(String password2) { this.password2 = password2; }
 }
