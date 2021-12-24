@@ -2,6 +2,7 @@ package com.shootit.shootitapp;
 
 import static android.content.ContentValues.TAG;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -88,7 +89,7 @@ public class LoginActivity extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success");
                     FirebaseUser user = mAuth.getCurrentUser();
-                    //updateUI(user);
+                    launchMainActivity();
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.getException());
@@ -112,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "signInWithEmail:success");
                     FirebaseUser user = mAuth.getCurrentUser();
-//                    updateUI(user);
+                    launchMainActivity();
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -122,6 +123,13 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+
+    private void launchMainActivity() {
+
+        Intent MainActivityLauncher = new Intent(this, MainActivity.class);
+        startActivity(MainActivityLauncher);
     }
 
     public String getEmail() {
