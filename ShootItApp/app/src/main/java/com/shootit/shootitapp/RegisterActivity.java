@@ -123,6 +123,8 @@ public class RegisterActivity extends AppCompatActivity {
 //                            });
 
                     mDatabase.child("users").child(userID).child("username").setValue(getUsername());
+                    mDatabase.child("users").child(userID).child("email").setValue(getEmail());
+
 
                     launchMainActivity();
                 } else {
