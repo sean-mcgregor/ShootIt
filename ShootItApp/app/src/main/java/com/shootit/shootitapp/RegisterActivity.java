@@ -20,11 +20,15 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
 
     // Initialize Firebase Auth
     private FirebaseAuth mAuth;
+    private DatabaseReference mDatabase;
+    String databaseURL = "https://shootit-886f2-default-rtdb.europe-west1.firebasedatabase.app/";
 
     private String username;
     private String email;
@@ -42,6 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         mAuth = FirebaseAuth.getInstance();
+        mDatabase = FirebaseDatabase.getInstance(databaseURL).getReference();
 
         final Button registerButton = findViewById(R.id.register_button);
         final Button loginButton = findViewById(R.id.login_button);
@@ -103,18 +108,21 @@ public class RegisterActivity extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success");
                     FirebaseUser user = mAuth.getCurrentUser();
+                    String userID = user.getUid();
 
                     UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(username).build();
 
-                    user.updateProfile(profileUpdates)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, "User profile updated.");
-                                    }
-                                }
-                            });
+//                    user.updateProfile(profileUpdates)
+//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<Void> task) {
+//                                    if (task.isSuccessful()) {
+//                                        Log.d(TAG, "User profile updated.");
+//                                    }
+//                                }
+//                            });
+
+                    mDatabase.child("users").child(userID).setValue(getUsername());
 
                     launchMainActivity();
                 } else {
