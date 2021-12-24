@@ -43,8 +43,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // Code here executes on main thread after user presses button
-                updateCredentials();
-                registerUser(getEmail(), getPassword());
+                launchRegisterActivity();
             }
         });
 
@@ -80,25 +79,10 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    public void registerUser(String email, String password) {
+    public void launchRegisterActivity() {
 
-        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "createUserWithEmail:success");
-                    FirebaseUser user = mAuth.getCurrentUser();
-                    launchMainActivity();
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                    Toast.makeText(LoginActivity.this, "Authentication failed.",
-                            Toast.LENGTH_SHORT).show();
-                    //updateUI(null);
-                }
-            }
-        });
+        Intent registerActivityLauncher = new Intent(this, RegisterActivity.class);
+        startActivity(registerActivityLauncher);
     }
 
 
