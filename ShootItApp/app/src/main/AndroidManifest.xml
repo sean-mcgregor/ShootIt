@@ -22,6 +22,10 @@
             android:name=".MainActivity"
             android:label="ShootIt">
         </activity>
+        <activity
+            android:name=".RegisterActivity"
+            android:label="ShootIt">
+        </activity>
     </application>
 
 </manifest>

@@ -19,7 +19,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class LoginActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     // Initialize Firebase Auth
@@ -31,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_register);
         mAuth = FirebaseAuth.getInstance();
         final Button registerButton = findViewById(R.id.register_button);
         final Button loginButton = findViewById(R.id.login_button);
@@ -43,7 +43,8 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // Code here executes on main thread after user presses button
-                launchRegisterActivity();
+                updateCredentials();
+                registerUser(getEmail(), getPassword());
             }
         });
 
@@ -52,8 +53,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 // Code here executes on main thread after user presses button
-                updateCredentials();
-                login(getEmail(), getPassword());
+                launchLoginActivity();
             }
         });
     }
@@ -74,46 +74,44 @@ public class LoginActivity extends AppCompatActivity {
 
     public void updateCredentials() {
 
-        setEmail(LoginActivity.this.emailInput.getText().toString());
-        setPassword(LoginActivity.this.passwordInput.getText().toString());
+        setEmail(RegisterActivity.this.emailInput.getText().toString());
+        setPassword(RegisterActivity.this.passwordInput.getText().toString());
     }
 
 
-    public void launchRegisterActivity() {
+    public void registerUser(String email, String password) {
 
-        Intent registerActivityLauncher = new Intent(this, RegisterActivity.class);
-        startActivity(registerActivityLauncher);
-    }
-
-
-    public void login(String email, String password) {
-
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
-
             public void onComplete(@NonNull Task<AuthResult> task) {
-
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "signInWithEmail:success");
+                    Log.d(TAG, "createUserWithEmail:success");
                     FirebaseUser user = mAuth.getCurrentUser();
                     launchMainActivity();
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithEmail:failure", task.getException());
-                    Toast.makeText(LoginActivity.this, "Authentication failed.",
+                    Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                    Toast.makeText(RegisterActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
-//                    updateUI(null);
+                    //updateUI(null);
                 }
             }
         });
     }
 
 
+    public void launchLoginActivity() {
+
+        Intent loginActivityLauncher = new Intent(this, LoginActivity.class);
+        startActivity(loginActivityLauncher);
+    }
+
+
     private void launchMainActivity() {
 
-        Intent MainActivityLauncher = new Intent(this, MainActivity.class);
-        startActivity(MainActivityLauncher);
+        Intent mainActivityLauncher = new Intent(this, MainActivity.class);
+        startActivity(mainActivityLauncher);
     }
 
     public String getEmail() {
