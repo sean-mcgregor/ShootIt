@@ -3,6 +3,7 @@ package com.shootit.shootitapp;
 import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -38,9 +40,12 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
         mAuth = FirebaseAuth.getInstance();
+
         final Button registerButton = findViewById(R.id.register_button);
         final Button loginButton = findViewById(R.id.login_button);
+
         usernameInput = findViewById(R.id.usernameInput);
         emailInput = findViewById(R.id.emailInput);
         passwordInput = findViewById(R.id.passwordInput);
@@ -52,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                 // Code here executes on main thread after user presses button
                 updateCredentials();
-                registerUser(getEmail(), getPassword());
+                registerUser(getUsername(), getEmail(), getPassword());
             }
         });
 
@@ -80,7 +85,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
-    public void updateCredentials() {
+    private void updateCredentials() {
 
         setUsername(RegisterActivity.this.usernameInput.getText().toString());
         setEmail(RegisterActivity.this.emailInput.getText().toString());
@@ -89,7 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
-    public void registerUser(String email, String password) {
+    private void registerUser(String username, String email, String password) {
 
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
@@ -98,6 +103,19 @@ public class RegisterActivity extends AppCompatActivity {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success");
                     FirebaseUser user = mAuth.getCurrentUser();
+
+                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(username).build();
+
+                    user.updateProfile(profileUpdates)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.d(TAG, "User profile updated.");
+                                    }
+                                }
+                            });
+
                     launchMainActivity();
                 } else {
                     // If sign in fails, display a message to the user.
@@ -111,7 +129,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
-    public void launchLoginActivity() {
+    private void launchLoginActivity() {
 
         Intent loginActivityLauncher = new Intent(this, LoginActivity.class);
         startActivity(loginActivityLauncher);
@@ -128,21 +146,13 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void setUsername(String username) { this.username = username; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() { return email; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getPassword() {
-        return password;
-    }
+    public String getPassword() { return password; }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    public void setPassword(String password) { this.password = password; }
 
     public String getPassword2() { return password2; }
 
