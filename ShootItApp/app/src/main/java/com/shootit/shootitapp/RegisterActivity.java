@@ -62,7 +62,11 @@ public class RegisterActivity extends AppCompatActivity {
 
                 // Code here executes on main thread after user presses button
                 updateCredentials();
-                registerUser(getUsername(), getEmail(), getPassword());
+
+                if( passwordsMatch(getPassword(), getPassword2()) ){
+
+                    registerUser(getUsername(), getEmail(), getPassword());
+                }
             }
         });
 
@@ -96,6 +100,20 @@ public class RegisterActivity extends AppCompatActivity {
         setEmail(RegisterActivity.this.emailInput.getText().toString());
         setPassword(RegisterActivity.this.passwordInput.getText().toString());
         setPassword2(RegisterActivity.this.password2Input.getText().toString());
+    }
+
+    private boolean passwordsMatch (String password, String password2) {
+
+        if( password.equals(password2)) {
+
+            return true;
+        }
+        else {
+
+            Toast.makeText(RegisterActivity.this, "Passwords do not match!",
+                    Toast.LENGTH_SHORT).show();
+            return false;
+        }
     }
 
 
