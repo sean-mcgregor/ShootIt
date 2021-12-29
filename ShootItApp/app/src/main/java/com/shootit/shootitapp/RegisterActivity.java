@@ -110,21 +110,8 @@ public class RegisterActivity extends AppCompatActivity {
                     FirebaseUser user = mAuth.getCurrentUser();
                     String userID = user.getUid();
 
-                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder().setDisplayName(username).build();
-
-//                    user.updateProfile(profileUpdates)
-//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<Void> task) {
-//                                    if (task.isSuccessful()) {
-//                                        Log.d(TAG, "User profile updated.");
-//                                    }
-//                                }
-//                            });
-
-                    mDatabase.child("users").child(userID).child("username").setValue(getUsername());
-                    mDatabase.child("users").child(userID).child("email").setValue(getEmail());
-
+                    mDatabase.child("users").child(userID).child("username").setValue(username);
+                    mDatabase.child("users").child(userID).child("email").setValue(email);
 
                     launchMainActivity();
                 } else {
@@ -132,7 +119,6 @@ public class RegisterActivity extends AppCompatActivity {
                     Log.w(TAG, "createUserWithEmail:failure", task.getException());
                     Toast.makeText(RegisterActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
-                    //updateUI(null);
                 }
             }
         });

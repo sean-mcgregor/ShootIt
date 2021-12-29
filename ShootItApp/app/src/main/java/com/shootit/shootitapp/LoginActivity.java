@@ -21,10 +21,12 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private FirebaseAuth mAuth;
     // Initialize Firebase Auth
+    private FirebaseAuth mAuth;
+
     private String email;
     private String password;
+
     EditText emailInput;
     EditText passwordInput;
 
@@ -103,7 +105,6 @@ public class LoginActivity extends AppCompatActivity {
                     Log.w(TAG, "signInWithEmail:failure", task.getException());
                     Toast.makeText(LoginActivity.this, "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
-//                    updateUI(null);
                 }
             }
         });
