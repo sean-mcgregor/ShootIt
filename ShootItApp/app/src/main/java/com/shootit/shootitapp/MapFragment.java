@@ -31,6 +31,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
@@ -66,9 +67,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(0, 0))
                 .title("Marker"));
-
     }
-
 
 
     public void launchCreatePointActivity() {
