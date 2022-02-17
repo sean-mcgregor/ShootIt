@@ -59,23 +59,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         googleMap = tempMap;
 
+        googleMap.getUiSettings().setRotateGesturesEnabled(false);
+        googleMap.getUiSettings().setTiltGesturesEnabled(false);
+
         // Creating a new marker on map
         googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(0, 0))
                 .title("Marker"));
 
-
-        // Set onclick listener for the map
-        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-
-            @Override
-            public void onMapClick(LatLng latLng) {
-
-                // Print location clicked via toast
-                Toast.makeText(getActivity(), latLng.toString(),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
 
