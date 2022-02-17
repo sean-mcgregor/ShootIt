@@ -35,23 +35,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return v;
     }
 
-    // Get a handle to the GoogleMap object and display marker.
+    // Access the googleMap object contained in the fragment, once ready
     @Override
     public void onMapReady(GoogleMap googleMap) {
+
+        // Creating a new marker on map
         googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(0, 0))
                 .title("Marker"));
 
+
+        // Set onclick listener for the map
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
 
             @Override
             public void onMapClick(LatLng latLng) {
-                /*
-                 * LatLng:Class will give us selected position lattigude and
-                 * longitude values
-                 */
+
+                // Print location clicked via toast
                 Toast.makeText(getActivity(), latLng.toString(),
-                        Toast.LENGTH_LONG).show();
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
