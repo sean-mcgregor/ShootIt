@@ -23,6 +23,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
     private Marker newPoint;
+    private GoogleMap googleMap;
 
     public MapFragment(){
         // require a empty public constructor
@@ -61,12 +62,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         } else {
 
             newPoint.setVisible(true);
+            newPoint.setPosition(new LatLng(googleMap.getCameraPosition().target.latitude, googleMap.getCameraPosition().target.longitude));
         }
     }
 
     // Access the googleMap object contained in the fragment, once ready
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(GoogleMap tempMap) {
+
+        googleMap = tempMap;
 
         // Creating a new marker on map
         googleMap.addMarker(new MarkerOptions()
