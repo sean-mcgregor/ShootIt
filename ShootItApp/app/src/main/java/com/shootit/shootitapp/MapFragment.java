@@ -1,5 +1,6 @@
 package com.shootit.shootitapp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +23,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
 
-    private Marker newPoint;
     private GoogleMap googleMap;
 
     public MapFragment(){
@@ -40,10 +40,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Click listener for floating add point button
         addPointButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Clicked",
-                        Toast.LENGTH_SHORT).show();
 
-                toggleVisibility(newPoint);
+                launchCreatePointActivity();
             }
         });
 
@@ -54,17 +52,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return v;
     }
 
-    private void toggleVisibility(Marker newPoint) {
-
-        if(newPoint.isVisible()) {
-
-            newPoint.setVisible(false);
-        } else {
-
-            newPoint.setVisible(true);
-            newPoint.setPosition(new LatLng(googleMap.getCameraPosition().target.latitude, googleMap.getCameraPosition().target.longitude));
-        }
-    }
 
     // Access the googleMap object contained in the fragment, once ready
     @Override
@@ -76,12 +63,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(0, 0))
                 .title("Marker"));
-
-        newPoint = googleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(30,30))
-                            .title("New Point")
-                            .draggable(true)
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
 
         // Set onclick listener for the map
@@ -95,5 +76,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+
+
+    public void launchCreatePointActivity() {
+
+        Intent pointCreatorLauncher = new Intent(getContext(), CreatePointActivity.class);
+        startActivity(pointCreatorLauncher);
     }
 }
