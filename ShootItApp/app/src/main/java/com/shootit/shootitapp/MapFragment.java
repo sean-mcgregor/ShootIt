@@ -9,7 +9,9 @@ import android.widget.Toast;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import androidx.fragment.app.Fragment;
@@ -18,6 +20,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
+
+
+    private Marker newPoint;
 
     public MapFragment(){
         // require a empty public constructor
@@ -31,10 +36,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         FloatingActionButton addPointButton = v.findViewById(R.id.addPointButton);
 
+        // Click listener for floating add point button
         addPointButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Toast.makeText(getActivity(), "Clicked",
                         Toast.LENGTH_SHORT).show();
+
+                toggleVisibility(newPoint);
             }
         });
 
@@ -45,6 +53,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         return v;
     }
 
+    private void toggleVisibility(Marker newPoint) {
+
+        if(newPoint.isVisible()) {
+
+            newPoint.setVisible(false);
+        } else {
+
+            newPoint.setVisible(true);
+        }
+    }
+
     // Access the googleMap object contained in the fragment, once ready
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -53,6 +72,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(0, 0))
                 .title("Marker"));
+
+        newPoint = googleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(30,30))
+                            .title("New Point")
+                            .draggable(true)
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
 
         // Set onclick listener for the map
