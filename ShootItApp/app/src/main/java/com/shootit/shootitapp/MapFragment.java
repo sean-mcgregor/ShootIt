@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -26,7 +27,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_map, container, false);
+
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        FloatingActionButton addPointButton = v.findViewById(R.id.addPointButton);
+
+        addPointButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Clicked",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
 
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
