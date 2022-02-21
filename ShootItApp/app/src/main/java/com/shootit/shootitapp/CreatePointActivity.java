@@ -1,6 +1,9 @@
 package com.shootit.shootitapp;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,6 +11,7 @@ import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -15,8 +19,11 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentContainerView;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -37,6 +44,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
     Marker newPoint;
     Button addPhotoButton;
+    PhotoFragment photoToAdd;
 
     ActivityResultLauncher<String> mGetContent;
 
@@ -53,10 +61,8 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                     public void onActivityResult(Uri uri) {
                         System.out.println(uri);
 
-                        ImageView imageToAdd = new ImageView(getApplicationContext());
-                        imageToAdd.setImageURI(uri);
-                        imageContainer.addView(imageToAdd);
-
+                        photoToAdd = new PhotoFragment(uri);
+                        getSupportFragmentManager().beginTransaction().add(R.id.imageContainer, photoToAdd).commit();
                     }
                 });
 

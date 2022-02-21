@@ -54,7 +54,7 @@
 
     <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="1dp"
         android:layout_marginBottom="1dp"
         app:layout_constraintBottom_toTopOf="@+id/map"
@@ -64,9 +64,8 @@
 
         <LinearLayout
             android:id="@+id/imageContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
             android:orientation="horizontal" />
     </HorizontalScrollView>
 
