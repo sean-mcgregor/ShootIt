@@ -22,22 +22,35 @@
         android:id="@+id/addPhotos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Button"
+        android:text="Add Image"
         app:layout_constraintBottom_toTopOf="@+id/map"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/description"
+        android:id="@+id/locationDescription"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:ems="10"
         android:gravity="start|top"
         android:inputType="textMultiLine"
+        android:hint="Description, notes, comments..."
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map"
         tools:layout_editor_absoluteX="99dp" />
+
+    <EditText
+        android:id="@+id/locationName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textAutoComplete"
+        android:hint="Location Title"
+        app:layout_constraintBottom_toTopOf="@+id/addPhotos"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

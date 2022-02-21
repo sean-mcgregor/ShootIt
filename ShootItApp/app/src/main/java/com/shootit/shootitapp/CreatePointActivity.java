@@ -21,9 +21,10 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class CreatePointActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    BottomNavigationView bottomNavigationView;
-    private FirebaseAuth firebaseAuth;
-    private FirebaseUser user;
+//    BottomNavigationView bottomNavigationView;
+//    private FirebaseAuth firebaseAuth;
+//    private FirebaseUser user;
+
     Marker newPoint;
 
     @Override
