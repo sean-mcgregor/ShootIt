@@ -1,12 +1,15 @@
 package com.shootit.shootitapp;
 
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultCallback;
@@ -37,20 +40,25 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
     ActivityResultLauncher<String> mGetContent;
 
-    {
-    mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-            new ActivityResultCallback<Uri>() {
-                @Override
-                public void onActivityResult(Uri uri) {
-                    System.out.println(uri);
-                }
-            });
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_point);
+        LinearLayout imageContainer = (LinearLayout) findViewById(R.id.imageContainer);
+
+        mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri uri) {
+                        System.out.println(uri);
+
+                        ImageView imageToAdd = new ImageView(getApplicationContext());
+                        imageToAdd.setImageURI(uri);
+                        imageContainer.addView(imageToAdd);
+
+                    }
+                });
 
         addPhotoButton = (Button) findViewById(R.id.addPhotos);
 
