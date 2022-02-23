@@ -42,11 +42,9 @@ import java.util.List;
 
 public class CreatePointActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-//    BottomNavigationView bottomNavigationView;
-//    private FirebaseAuth firebaseAuth;
-//    private FirebaseUser user;
 
     Marker newPoint;
+    private FirebaseUser user;
 
     private EditText titleInput, descriptionInput;
     private Button addPhotoButton, confirmButton;
@@ -64,6 +62,8 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_point);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        System.out.println(user);
 
         titleInput = (EditText) findViewById(R.id.locationName);
         descriptionInput = (EditText) findViewById(R.id.locationDescription);
@@ -89,7 +89,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                 locationDescription = descriptionInput.getText().toString();
                 locationCoords = newPoint.getPosition();
 
-                ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords);
+                ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid());
                 newLocation.pushToDatabase();
 
             }

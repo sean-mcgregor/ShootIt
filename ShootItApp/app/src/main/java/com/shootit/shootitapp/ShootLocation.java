@@ -17,6 +17,7 @@ public class ShootLocation {
     private String latitude;
     private String longitude;
     private LatLng position;
+    private String author;
     private List<String> images = new ArrayList<String>();
 
 
@@ -26,21 +27,34 @@ public class ShootLocation {
     }
 
 
-    public ShootLocation(String title, String description, LatLng position){
+    public ShootLocation(String title, String description, LatLng position, String author){
 
         this.title = title;
         this.description = description;
         this.position = position;
+        this.latitude = Double.toString(position.latitude);
+        this.longitude = Double.toString(position.longitude);
+        this.author = author;
     }
 
     public boolean pushToDatabase() {
 
-//        mDatabase = FirebaseDatabase.getInstance(databaseURL).getReference();
-//        mDatabase.child("locations").child(userID).child("username").setValue(username);
+
         StringBuilder sb = new StringBuilder();
         sb.append(this.position.latitude);
         sb.append(this.position.longitude);
-        System.out.println(sb.toString());
+        String id = sb.toString().replace(".", "dot");
+        mDatabase = FirebaseDatabase.getInstance(databaseURL).getReference();
+
+        // Creating location in firebase
+        mDatabase.child("locations").child(id).child("title").setValue(this.title);
+        mDatabase.child("locations").child(id).child("description").setValue(this.description);
+        mDatabase.child("locations").child(id).child("latitude").setValue(this.latitude);
+        mDatabase.child("locations").child(id).child("longitude").setValue(this.longitude);
+        mDatabase.child("locations").child(id).child("author").setValue(this.author);
+
+        // Creating a reference to the point under firebase user object
+        mDatabase.child("users").child(this.author).child("shootlocations").child(id).setValue(id);
         return true;
     }
 }
