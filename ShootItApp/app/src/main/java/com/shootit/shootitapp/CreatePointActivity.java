@@ -11,6 +11,7 @@ import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,6 +37,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CreatePointActivity extends AppCompatActivity implements OnMapReadyCallback {
 
 //    BottomNavigationView bottomNavigationView;
@@ -43,9 +47,16 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 //    private FirebaseUser user;
 
     Marker newPoint;
-    Button addPhotoButton;
-    PhotoFragment photoToAdd;
 
+    private EditText titleInput, descriptionInput;
+    private Button addPhotoButton, confirmButton;
+    private String locationTitle, locationDescription;
+    private LatLng locationCoords;
+    private List<Uri> photosList = new ArrayList<>();
+    private GoogleMap googleMap;
+
+    PhotoFragment photoToAdd;
+    LinearLayout imageContainer;
     ActivityResultLauncher<String> mGetContent;
 
 
@@ -53,32 +64,46 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_point);
-        LinearLayout imageContainer = (LinearLayout) findViewById(R.id.imageContainer);
 
-        mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-                new ActivityResultCallback<Uri>() {
-                    @Override
-                    public void onActivityResult(Uri uri) {
-                        System.out.println(uri);
-
-                        if (uri != null){
-
-                            addPhoto(uri);
-                        }
-                    }
-                });
-
+        titleInput = (EditText) findViewById(R.id.locationName);
+        descriptionInput = (EditText) findViewById(R.id.locationDescription);
         addPhotoButton = (Button) findViewById(R.id.addPhotos);
+        confirmButton = (Button) findViewById(R.id.confirm_button);
+        imageContainer = (LinearLayout) findViewById(R.id.imageContainer);
 
         addPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                // Pass in the mime type you'd like to allow the user to select
-                // as the input
+                // Type of content user can select
                 mGetContent.launch("image/*");
             }
         });
+
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                // Gather information user has provided and create new ShootLocation
+                locationTitle = titleInput.getText().toString();
+                locationDescription = descriptionInput.getText().toString();
+                locationCoords = newPoint.getPosition();
+
+                ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords);
+                System.out.println(newLocation.toString());
+
+            }
+        });
+
+
+        mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                new ActivityResultCallback<Uri>() {
+                    @Override
+                    public void onActivityResult(Uri uri) {
+
+                        addPhoto(uri);
+                    }
+                });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -89,15 +114,22 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         }
     }
 
+
     private void addPhoto(Uri uri) {
 
-        photoToAdd = new PhotoFragment(uri);
-        getSupportFragmentManager().beginTransaction().add(R.id.imageContainer, photoToAdd).commit();
+        if (uri != null){
+
+            photoToAdd = new PhotoFragment(uri);
+            getSupportFragmentManager().beginTransaction().add(R.id.imageContainer, photoToAdd).commit();
+        }
+
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
 
+    @Override
+    public void onMapReady(GoogleMap tempMap) {
+
+        googleMap = tempMap;
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
 
