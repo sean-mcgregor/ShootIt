@@ -33,9 +33,12 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,12 +48,15 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
     Marker newPoint;
     private FirebaseUser user;
+    // Create a storage reference from our app
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    StorageReference storageRef = storage.getReference();
 
     private EditText titleInput, descriptionInput;
     private Button addPhotoButton, confirmButton;
     private String locationTitle, locationDescription;
     private LatLng locationCoords;
-    private List<Uri> photosList = new ArrayList<>();
+    private List<PhotoFragment> photosList = new ArrayList<>();
     private GoogleMap googleMap;
 
     PhotoFragment photoToAdd;
@@ -89,9 +95,17 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                 locationDescription = descriptionInput.getText().toString();
                 locationCoords = newPoint.getPosition();
 
-                ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid());
-                newLocation.pushToDatabase();
+                // Gather Uris for images
+                photosList.forEach(photoFragment -> {
+                    if (photoFragment.deleted == false) {
 
+                        System.out.println(photoFragment.photoUri);
+                    }
+                });
+
+
+//                ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid());
+//                newLocation.pushToDatabase();
             }
         });
 
@@ -120,6 +134,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         if (uri != null){
 
             photoToAdd = new PhotoFragment(uri);
+            photosList.add(photoToAdd);
             getSupportFragmentManager().beginTransaction().add(R.id.imageContainer, photoToAdd).commit();
         }
 
