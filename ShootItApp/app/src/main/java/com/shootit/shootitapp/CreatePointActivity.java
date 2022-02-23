@@ -34,11 +34,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +50,9 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
     Marker newPoint;
     private FirebaseUser user;
-    // Create a storage reference from our app
-    FirebaseStorage storage = FirebaseStorage.getInstance();
-    StorageReference storageRef = storage.getReference();
+
+    private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference storageRef, imagesRef;
 
     private EditText titleInput, descriptionInput;
     private Button addPhotoButton, confirmButton;
@@ -66,10 +68,12 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_point);
+
         user = FirebaseAuth.getInstance().getCurrentUser();
-        System.out.println(user);
+        storageRef = storage.getReference();
 
         titleInput = (EditText) findViewById(R.id.locationName);
         descriptionInput = (EditText) findViewById(R.id.locationDescription);
@@ -95,13 +99,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                 locationDescription = descriptionInput.getText().toString();
                 locationCoords = newPoint.getPosition();
 
-                // Gather Uris for images
-                photosList.forEach(photoFragment -> {
-                    if (photoFragment.deleted == false) {
-
-                        System.out.println(photoFragment.photoUri);
-                    }
-                });
+                uploadPhotos();
 
 
 //                ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid());
@@ -126,6 +124,40 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
             mapFragment.getMapAsync(this);
         }
+    }
+
+
+    private void uploadPhotos() {
+
+        // Gather Uris for images
+        photosList.forEach(photoFragment -> {
+            if (photoFragment.deleted == false) {
+
+                StorageReference currentPhotoRef = storageRef.child("images/"+photoFragment.photoUri.getLastPathSegment());
+                System.out.println(photoFragment.photoUri);
+
+                UploadTask uploadTask = currentPhotoRef.putFile(photoFragment.photoUri);
+
+                // Register observers to listen for when the download is done or if it fails
+                uploadTask.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        Toast.makeText(CreatePointActivity.this, "Image upload failed.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                        // ...
+                        Toast.makeText(CreatePointActivity.this, "Image upload success.",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+        });
     }
 
 

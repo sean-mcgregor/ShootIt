@@ -39,7 +39,6 @@ public class ShootLocation {
 
     public boolean pushToDatabase() {
 
-
         StringBuilder sb = new StringBuilder();
         sb.append(this.position.latitude);
         sb.append(this.position.longitude);
