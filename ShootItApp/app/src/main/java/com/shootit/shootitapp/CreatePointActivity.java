@@ -90,7 +90,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                 locationCoords = newPoint.getPosition();
 
                 ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords);
-                System.out.println(newLocation.toString());
+                newLocation.pushToDatabase();
 
             }
         });
