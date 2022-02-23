@@ -61,8 +61,10 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                     public void onActivityResult(Uri uri) {
                         System.out.println(uri);
 
-                        photoToAdd = new PhotoFragment(uri);
-                        getSupportFragmentManager().beginTransaction().add(R.id.imageContainer, photoToAdd).commit();
+                        if (uri != null){
+
+                            addPhoto(uri);
+                        }
                     }
                 });
 
@@ -85,6 +87,12 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
             mapFragment.getMapAsync(this);
         }
+    }
+
+    private void addPhoto(Uri uri) {
+
+        photoToAdd = new PhotoFragment(uri);
+        getSupportFragmentManager().beginTransaction().add(R.id.imageContainer, photoToAdd).commit();
     }
 
     @Override
