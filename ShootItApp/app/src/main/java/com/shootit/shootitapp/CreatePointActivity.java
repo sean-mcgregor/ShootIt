@@ -88,6 +88,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         descriptionInput = (EditText) findViewById(R.id.locationDescription);
         addPhotoButton = (Button) findViewById(R.id.addPhotos);
         confirmButton = (Button) findViewById(R.id.confirm_button);
+        backButton = (Button) findViewById(R.id.back_button);
         imageContainer = (LinearLayout) findViewById(R.id.imageContainer);
 
         addPhotoButton.setOnClickListener(new View.OnClickListener() {
@@ -112,8 +113,6 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                 pushToDatabase(newLocation);
             }
         });
-
-
 
         mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 new ActivityResultCallback<Uri>() {
@@ -153,7 +152,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         sb.append(newLocation.getLongitude());
         String id = sb.toString().replace(".", "dot");
 
-        List<String> imageLinks = uploadPhotos(newLocation.getImages());
+        uploadPhotos(newLocation.getImages(), id);
 
         // Creating location in firebase
         mDatabase.child("locations").child(id).child("title").setValue(newLocation.getTitle());
@@ -162,20 +161,13 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         mDatabase.child("locations").child(id).child("longitude").setValue(newLocation.getLongitude());
         mDatabase.child("locations").child(id).child("author").setValue(newLocation.getAuthor());
 
-        imageLinks.forEach(url -> {
-
-            mDatabase.child("locations").child(id).child("images").child(url).setValue(url);
-        });
-
         // Creating a reference to the point under firebase user object
-        mDatabase.child("users").child(newLocation.getAuthor()).child("shootlocations").child(id).setValue(id);
+        mDatabase.child("users").child(newLocation.getAuthor()).child("locations").child(id).setValue(id);
         return true;
     }
 
 
-    public List<String> uploadPhotos(List<Uri> photosList) {
-
-        List<String> imageLinks = new ArrayList<>();
+    public void uploadPhotos(List<Uri> photosList, String locationId) {
 
         // Gather Uris for images
         photosList.forEach(photo -> {
@@ -199,8 +191,9 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                 @Override
                 public void onComplete(@NonNull Task<Uri> task) {
                     if (task.isSuccessful()) {
-                        imageLinks.add(task.getResult().toString());
-                        System.out.println("Image uploaded and link is " + task.getResult().toString());
+                        String url = task.getResult().toString();
+                        System.out.println("Image uploaded");
+                        mDatabase.child("locations").child(locationId).child("images").child(url.replaceAll("[^a-zA-Z0-9]", "")).setValue(url);
                     } else {
                         // Handle failures
                         // ...
@@ -208,8 +201,6 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                 }
             });
         });
-
-        return imageLinks;
     }
 
     @Override
