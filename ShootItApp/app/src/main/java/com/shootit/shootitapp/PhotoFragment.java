@@ -16,6 +16,7 @@ public class PhotoFragment extends Fragment {
 
     Uri photoUri;
     ImageView imageView;
+    boolean deleted = false;
 
     public PhotoFragment(Uri uri){
         // require a empty public constructor
@@ -45,6 +46,7 @@ public class PhotoFragment extends Fragment {
                             public void onClick(DialogInterface dialog, int which) {
 
                                 view.setVisibility(View.GONE);
+                                deleted = true;
                             }
                         });
                 builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
