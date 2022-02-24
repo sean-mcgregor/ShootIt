@@ -33,8 +33,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -150,7 +153,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         sb.append(newLocation.getLongitude());
         String id = sb.toString().replace(".", "dot");
 
-        uploadPhotos(newLocation.getImages());
+        List<String> imageLinks = uploadPhotos(newLocation.getImages());
 
         // Creating location in firebase
         mDatabase.child("locations").child(id).child("title").setValue(newLocation.getTitle());
@@ -159,15 +162,20 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         mDatabase.child("locations").child(id).child("longitude").setValue(newLocation.getLongitude());
         mDatabase.child("locations").child(id).child("author").setValue(newLocation.getAuthor());
 
+        imageLinks.forEach(url -> {
+
+            mDatabase.child("locations").child(id).child("images").child(url).setValue(url);
+        });
+
         // Creating a reference to the point under firebase user object
         mDatabase.child("users").child(newLocation.getAuthor()).child("shootlocations").child(id).setValue(id);
         return true;
     }
 
 
+    public List<String> uploadPhotos(List<Uri> photosList) {
 
-
-    public void uploadPhotos(List<Uri> photosList) {
+        List<String> imageLinks = new ArrayList<>();
 
         // Gather Uris for images
         photosList.forEach(photo -> {
@@ -177,24 +185,31 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
             UploadTask uploadTask = currentPhotoRef.putFile(photo);
 
-            // Register observers to listen for when the download is done or if it fails
-            uploadTask.addOnFailureListener(new OnFailureListener() {
+            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override
-                public void onFailure(@NonNull Exception exception) {
-                    // Handle unsuccessful uploads
-                    Toast.makeText(CreatePointActivity.this, "Image upload failed.",
-                            Toast.LENGTH_SHORT).show();
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    // Continue with the task to get the download URL
+                    return currentPhotoRef.getDownloadUrl();
                 }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
                 @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                    // ...
-                    Toast.makeText(CreatePointActivity.this, "Image upload success.",
-                            Toast.LENGTH_SHORT).show();
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        imageLinks.add(task.getResult().toString());
+                        System.out.println("Image uploaded and link is " + task.getResult().toString());
+                    } else {
+                        // Handle failures
+                        // ...
+                    }
                 }
             });
         });
+
+        return imageLinks;
     }
 
     @Override
