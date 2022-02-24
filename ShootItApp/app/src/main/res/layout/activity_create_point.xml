@@ -73,7 +73,7 @@
 
     <Button
         android:id="@+id/back_button"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:layout_width="110dp"
         android:layout_marginStart="8dp"
         android:backgroundTint="@color/BACK_BUTTON"
@@ -83,10 +83,11 @@
 
     <Button
         android:id="@+id/confirm_button"
-        android:layout_height="wrap_content"
-        android:layout_width="110dp"
+        android:layout_height="45dp"
+        android:layout_width="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="Confirm"
+        android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 
