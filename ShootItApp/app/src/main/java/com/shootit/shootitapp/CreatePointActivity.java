@@ -38,6 +38,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -54,11 +56,14 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference storageRef, imagesRef;
 
+    private DatabaseReference mDatabase;
+    private String databaseURL = "https://shootit-886f2-default-rtdb.europe-west1.firebasedatabase.app/";
+
     private EditText titleInput, descriptionInput;
-    private Button addPhotoButton, confirmButton;
+    private Button addPhotoButton, confirmButton, backButton;
     private String locationTitle, locationDescription;
     private LatLng locationCoords;
-    private List<PhotoFragment> photosList = new ArrayList<>();
+    private List<PhotoFragment> photosList = new ArrayList<PhotoFragment>();
     private GoogleMap googleMap;
 
     PhotoFragment photoToAdd;
@@ -74,6 +79,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         storageRef = storage.getReference();
+        mDatabase = FirebaseDatabase.getInstance(databaseURL).getReference();
 
         titleInput = (EditText) findViewById(R.id.locationName);
         descriptionInput = (EditText) findViewById(R.id.locationDescription);
@@ -99,13 +105,11 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                 locationDescription = descriptionInput.getText().toString();
                 locationCoords = newPoint.getPosition();
 
-                uploadPhotos();
-
-
-//                ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid());
-//                newLocation.pushToDatabase();
+                ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid(), photosList);
+                pushToDatabase(newLocation);
             }
         });
+
 
 
         mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
@@ -127,40 +131,6 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
     }
 
 
-    private void uploadPhotos() {
-
-        // Gather Uris for images
-        photosList.forEach(photoFragment -> {
-            if (photoFragment.deleted == false) {
-
-                StorageReference currentPhotoRef = storageRef.child("images/"+photoFragment.photoUri.getLastPathSegment());
-                System.out.println(photoFragment.photoUri);
-
-                UploadTask uploadTask = currentPhotoRef.putFile(photoFragment.photoUri);
-
-                // Register observers to listen for when the download is done or if it fails
-                uploadTask.addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        Toast.makeText(CreatePointActivity.this, "Image upload failed.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
-                        // ...
-                        Toast.makeText(CreatePointActivity.this, "Image upload success.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-            }
-        });
-    }
-
-
     private void addPhoto(Uri uri) {
 
         if (uri != null){
@@ -172,6 +142,60 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
     }
 
+
+    public boolean pushToDatabase(ShootLocation newLocation) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(newLocation.getLatitude());
+        sb.append(newLocation.getLongitude());
+        String id = sb.toString().replace(".", "dot");
+
+        uploadPhotos(newLocation.getImages());
+
+        // Creating location in firebase
+        mDatabase.child("locations").child(id).child("title").setValue(newLocation.getTitle());
+        mDatabase.child("locations").child(id).child("description").setValue(newLocation.getDescription());
+        mDatabase.child("locations").child(id).child("latitude").setValue(newLocation.getLatitude());
+        mDatabase.child("locations").child(id).child("longitude").setValue(newLocation.getLongitude());
+        mDatabase.child("locations").child(id).child("author").setValue(newLocation.getAuthor());
+
+        // Creating a reference to the point under firebase user object
+        mDatabase.child("users").child(newLocation.getAuthor()).child("shootlocations").child(id).setValue(id);
+        return true;
+    }
+
+
+
+
+    public void uploadPhotos(List<Uri> photosList) {
+
+        // Gather Uris for images
+        photosList.forEach(photo -> {
+
+            StorageReference currentPhotoRef = storageRef.child("images/" + photo.getLastPathSegment());
+            System.out.println(photo);
+
+            UploadTask uploadTask = currentPhotoRef.putFile(photo);
+
+            // Register observers to listen for when the download is done or if it fails
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle unsuccessful uploads
+                    Toast.makeText(CreatePointActivity.this, "Image upload failed.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, etc.
+                    // ...
+                    Toast.makeText(CreatePointActivity.this, "Image upload success.",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
+    }
 
     @Override
     public void onMapReady(GoogleMap tempMap) {
