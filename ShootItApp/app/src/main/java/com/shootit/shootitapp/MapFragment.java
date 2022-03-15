@@ -1,6 +1,7 @@
 package com.shootit.shootitapp;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,8 +30,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -39,6 +41,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private DatabaseReference mDatabase;
     private DatabaseReference mLocations;
     private String databaseURL = "https://shootit-886f2-default-rtdb.europe-west1.firebasedatabase.app/";
+    private List<ShootLocation> locationsFromFirebase = new ArrayList<ShootLocation>();
 
     public MapFragment(){
         // require a empty public constructor
@@ -47,13 +50,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_map, container, false);
+
         mDatabase = FirebaseDatabase.getInstance(databaseURL).getReference();
         mLocations = FirebaseDatabase.getInstance(databaseURL).getReference().child("locations");
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        FloatingActionButton addPointButton = v.findViewById(R.id.addPointButton);
 
         ValueEventListener locationsListener = new ValueEventListener() {
             @Override
@@ -74,8 +73,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                             Double.parseDouble(current.getLongitude())
                     ));
 
-                    Log.d("location ",current.toString());
+                    locationSnapshot.child("images").getChildren().forEach(child -> {
+
+                        Uri imageURI = Uri.parse(child.getValue().toString());
+                        List<Uri> images = current.getImages();
+                        images.add(imageURI);
+                        current.setImages(images);
+                    });
+
+                    Log.d("images for this location", current.getImages().toString());
+                    locationsFromFirebase.add(current);
                 }
+
+                Log.d("All locations", locationsFromFirebase.toString());
+                locationsFromFirebase.forEach(location -> {
+
+                    // Creating a new marker on map
+                    googleMap.addMarker(new MarkerOptions()
+                            .position(location.getPosition())
+                            .title(location.getTitle()));
+                });
             }
 
             @Override
@@ -84,7 +101,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 Log.w("TAG", "loadPost:onCancelled", databaseError.toException());
             }
         };
+
         mLocations.addValueEventListener(locationsListener);
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_map, container, false);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        FloatingActionButton addPointButton = v.findViewById(R.id.addPointButton);
+
 
         // Click listener for floating add point button
         addPointButton.setOnClickListener(new View.OnClickListener() {
@@ -110,11 +134,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
-
-        // Creating a new marker on map
-        googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(0, 0))
-                .title("Marker"));
 
     }
 
