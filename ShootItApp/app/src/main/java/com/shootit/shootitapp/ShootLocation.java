@@ -97,4 +97,17 @@ public class ShootLocation {
     public void setImages(List<Uri> images) {
         this.images = images;
     }
+
+    @Override
+    public String toString() {
+        return "ShootLocation{" +
+                "title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", latitude='" + latitude + '\'' +
+                ", longitude='" + longitude + '\'' +
+                ", position=" + position +
+                ", author='" + author + '\'' +
+                ", images=" + images +
+                '}';
+    }
 }

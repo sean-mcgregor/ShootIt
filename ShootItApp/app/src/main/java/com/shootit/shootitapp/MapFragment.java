@@ -30,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
@@ -58,9 +59,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get Post object and use the values to update the UI
-                HashMap<String, ShootLocation> allLocations = (HashMap<String, ShootLocation>) dataSnapshot.getValue();
-                Log.d("Recieved from firebase", allLocations.toString());
-                // ..
+
+                for (DataSnapshot locationSnapshot: dataSnapshot.getChildren()) {
+                    // TODO: handle the post
+                    ShootLocation current = new ShootLocation();
+
+                    current.setAuthor(locationSnapshot.child("author").getValue().toString());
+                    current.setTitle(locationSnapshot.child("title").getValue().toString());
+                    current.setDescription(locationSnapshot.child("description").getValue().toString());
+                    current.setLatitude(locationSnapshot.child("latitude").getValue().toString());
+                    current.setLongitude(locationSnapshot.child("longitude").getValue().toString());
+                    current.setPosition(new LatLng(
+                            Double.parseDouble(current.getLatitude()),
+                            Double.parseDouble(current.getLongitude())
+                    ));
+
+                    Log.d("location ",current.toString());
+                }
             }
 
             @Override
