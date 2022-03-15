@@ -171,6 +171,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
         // Creating a reference to the point under firebase user object
         mDatabase.child("users").child(newLocation.getAuthor()).child("locations").child(id).setValue(id);
+        finish();
         return true;
     }
 
