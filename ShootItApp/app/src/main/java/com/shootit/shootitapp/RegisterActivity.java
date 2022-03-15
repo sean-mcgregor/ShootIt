@@ -28,7 +28,7 @@ public class RegisterActivity extends AppCompatActivity {
     // Initialize Firebase Auth
     private FirebaseAuth mAuth;
     private DatabaseReference mDatabase;
-    String databaseURL = "https://shootit-886f2-default-rtdb.europe-west1.firebasedatabase.app/";
+    private String databaseURL = "https://shootit-886f2-default-rtdb.europe-west1.firebasedatabase.app/";
 
     private String username;
     private String email;
