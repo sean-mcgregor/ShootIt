@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClickListener, OnMapReadyCallback {
 
 
     private GoogleMap googleMap;
@@ -134,7 +134,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
+        googleMap.setOnInfoWindowClickListener(this);
 
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(getContext(), "Info window clicked",
+                Toast.LENGTH_SHORT).show();
     }
 
 
