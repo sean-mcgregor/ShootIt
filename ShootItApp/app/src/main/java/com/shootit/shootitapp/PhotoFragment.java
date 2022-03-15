@@ -12,6 +12,8 @@ import android.widget.LinearLayout;
 
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+
 public class PhotoFragment extends Fragment {
 
     Uri photoUri;
@@ -30,7 +32,8 @@ public class PhotoFragment extends Fragment {
 
         imageView = (ImageView) v.findViewById(R.id.imageView);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setImageURI(photoUri);
+        Glide.with(this).load(photoUri).into(imageView);
+//        imageView.setImageURI(photoUri);
 
         v.setOnClickListener(new View.OnClickListener() {
             @Override

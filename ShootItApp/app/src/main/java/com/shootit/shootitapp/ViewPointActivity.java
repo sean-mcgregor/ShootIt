@@ -92,14 +92,10 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
             }
         });
 
-        mGetContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-                new ActivityResultCallback<Uri>() {
-                    @Override
-                    public void onActivityResult(Uri uri) {
+        location.getImages().forEach(uri -> {
 
-                        addPhoto(uri);
-                    }
-                });
+            addPhoto(uri);
+        });
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -116,7 +112,6 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
         if (uri != null){
 
             photoToAdd = new PhotoFragment(uri);
-            photosList.add(photoToAdd);
             getSupportFragmentManager().beginTransaction().add(R.id.imageContainer, photoToAdd).commit();
         }
 
@@ -131,8 +126,6 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
 
         newPoint = googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(googleMap.getCameraPosition().target.latitude, googleMap.getCameraPosition().target.longitude))
-                .title("New Point")
-                .draggable(true));
+                .position(location.getPosition()));
     }
 }

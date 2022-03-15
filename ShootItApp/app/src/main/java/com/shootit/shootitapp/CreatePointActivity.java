@@ -163,11 +163,11 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         uploadPhotos(newLocation.getImages(), id);
 
         // Creating location in firebase
+        mDatabase.child("locations").child(id).child("author").setValue(newLocation.getAuthor());
         mDatabase.child("locations").child(id).child("title").setValue(newLocation.getTitle());
         mDatabase.child("locations").child(id).child("description").setValue(newLocation.getDescription());
         mDatabase.child("locations").child(id).child("latitude").setValue(newLocation.getLatitude());
         mDatabase.child("locations").child(id).child("longitude").setValue(newLocation.getLongitude());
-        mDatabase.child("locations").child(id).child("author").setValue(newLocation.getAuthor());
 
         // Creating a reference to the point under firebase user object
         mDatabase.child("users").child(newLocation.getAuthor()).child("locations").child(id).setValue(id);
