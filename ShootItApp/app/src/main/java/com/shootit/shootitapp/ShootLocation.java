@@ -1,13 +1,15 @@
 package com.shootit.shootitapp;
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShootLocation {
+public class ShootLocation implements Parcelable {
 
     private String title;
     private String description;
@@ -110,4 +112,52 @@ public class ShootLocation {
                 ", images=" + images +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.title);
+        dest.writeString(this.description);
+        dest.writeString(this.latitude);
+        dest.writeString(this.longitude);
+        dest.writeParcelable(this.position, flags);
+        dest.writeString(this.author);
+        dest.writeTypedList(this.images);
+    }
+
+    public void readFromParcel(Parcel source) {
+        this.title = source.readString();
+        this.description = source.readString();
+        this.latitude = source.readString();
+        this.longitude = source.readString();
+        this.position = source.readParcelable(LatLng.class.getClassLoader());
+        this.author = source.readString();
+        this.images = source.createTypedArrayList(Uri.CREATOR);
+    }
+
+    protected ShootLocation(Parcel in) {
+        this.title = in.readString();
+        this.description = in.readString();
+        this.latitude = in.readString();
+        this.longitude = in.readString();
+        this.position = in.readParcelable(LatLng.class.getClassLoader());
+        this.author = in.readString();
+        this.images = in.createTypedArrayList(Uri.CREATOR);
+    }
+
+    public static final Creator<ShootLocation> CREATOR = new Creator<ShootLocation>() {
+        @Override
+        public ShootLocation createFromParcel(Parcel source) {
+            return new ShootLocation(source);
+        }
+
+        @Override
+        public ShootLocation[] newArray(int size) {
+            return new ShootLocation[size];
+        }
+    };
 }

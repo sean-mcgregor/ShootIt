@@ -3,6 +3,7 @@ package com.shootit.shootitapp;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -91,7 +92,8 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
                     // Creating a new marker on map
                     googleMap.addMarker(new MarkerOptions()
                             .position(location.getPosition())
-                            .title(location.getTitle()));
+                            .title(location.getTitle()))
+                            .setTag(location);
                 });
             }
 
@@ -142,6 +144,8 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
     public void onInfoWindowClick(Marker marker) {
         Toast.makeText(getContext(), "Info window clicked",
                 Toast.LENGTH_SHORT).show();
+
+        launchViewPointActivity((ShootLocation) marker.getTag());
     }
 
 
@@ -149,5 +153,13 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
 
         Intent pointCreatorLauncher = new Intent(getContext(), CreatePointActivity.class);
         startActivity(pointCreatorLauncher);
+    }
+
+
+    public void launchViewPointActivity(ShootLocation location) {
+
+        Intent pointViewerLauncher = new Intent(getContext(), ViewPointActivity.class);
+        pointViewerLauncher.putExtra("location", (Parcelable) location);
+        startActivity(pointViewerLauncher);
     }
 }
