@@ -95,6 +95,8 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
                             .title(location.getTitle()))
                             .setTag(location);
                 });
+
+                mLocations.removeEventListener(this);
             }
 
             @Override
@@ -105,6 +107,7 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
         };
 
         mLocations.addValueEventListener(locationsListener);
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 

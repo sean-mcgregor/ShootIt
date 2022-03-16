@@ -111,7 +111,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
 
         if (uri != null){
 
-            photoToAdd = new PhotoFragment(uri);
+            photoToAdd = new PhotoFragment(uri, false);
             getSupportFragmentManager().beginTransaction().add(R.id.imageContainer, photoToAdd).commit();
         }
 

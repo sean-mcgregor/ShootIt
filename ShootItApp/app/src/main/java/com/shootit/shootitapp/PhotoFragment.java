@@ -18,7 +18,14 @@ public class PhotoFragment extends Fragment {
 
     Uri photoUri;
     ImageView imageView;
+    boolean deletable = true;
     boolean deleted = false;
+
+    public PhotoFragment(Uri uri, Boolean deletable) {
+
+        this.photoUri = uri;
+        this.deletable = deletable;
+    }
 
     public PhotoFragment(Uri uri){
         // require a empty public constructor
@@ -32,38 +39,41 @@ public class PhotoFragment extends Fragment {
 
         imageView = (ImageView) v.findViewById(R.id.imageView);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
         Glide.with(this).load(photoUri).into(imageView);
 //        imageView.setImageURI(photoUri);
 
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        if (deletable) {
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setCancelable(true);
-                builder.setTitle("Remove Image?");
-                builder.setMessage("Are you sure you want to remove this image?");
-                builder.setPositiveButton("Confirm",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                                view.setVisibility(View.GONE);
-                                deleted = true;
-                            }
-                        });
-                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setCancelable(true);
+                    builder.setTitle("Remove Image?");
+                    builder.setMessage("Are you sure you want to remove this image?");
+                    builder.setPositiveButton("Confirm",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
-                    }
-                });
+                                    view.setVisibility(View.GONE);
+                                    deleted = true;
+                                }
+                            });
+                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
+                        }
+                    });
 
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            });
+        }
 
         return v;
     }
