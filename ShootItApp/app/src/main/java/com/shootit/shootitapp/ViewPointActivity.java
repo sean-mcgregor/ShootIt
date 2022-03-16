@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -124,6 +125,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
         googleMap = tempMap;
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location.getPosition(), 15));
 
         newPoint = googleMap.addMarker(new MarkerOptions()
                 .position(location.getPosition()));
