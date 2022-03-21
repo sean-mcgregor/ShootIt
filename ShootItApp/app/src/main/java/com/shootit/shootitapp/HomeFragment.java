@@ -16,16 +16,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.common.api.Response;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -38,12 +38,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.Executor;
-
 public class HomeFragment extends Fragment {
 
     private FirebaseUser user;
     private TextView welcomeBanner;
+    private TextView weatherText;
+    private TextView locationText;
     private DatabaseReference mUser;
     private JsonObjectRequest jsonRequest;
     private String apiKey = BuildConfig.WEATHER_API_KEY;
@@ -62,19 +62,12 @@ public class HomeFragment extends Fragment {
         user = FirebaseAuth.getInstance().getCurrentUser();
         mUser = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
 
-        checkLocationPermissions();
-        getUserLocation();
-
-        updateWelcomeBanner();
-
-        updateWeather();
+        handleLocationPermissions();
 
         return v;
     }
 
-    private void checkLocationPermissions() {
-
-
+    private void handleLocationPermissions() {
 
         // Register the permissions callback, which handles the user's response to the
         // system permissions dialog. Save the return value, an instance of
@@ -90,6 +83,8 @@ public class HomeFragment extends Fragment {
                         // same time, respect the user's decision. Don't link to system
                         // settings in an effort to convince the user to change their
                         // decision.
+
+                        Toast.makeText(getContext(), "Many features unavailable without permission being granted.", Toast.LENGTH_LONG).show();
                     }
                 });
 
@@ -98,6 +93,7 @@ public class HomeFragment extends Fragment {
                 PackageManager.PERMISSION_GRANTED) {
             // You can use the API that requires the permission.
             Log.d("Permissions", "granted");
+            buildUI();
         } else {
             // You can directly ask for the permission.
             // The registered ActivityResultCallback gets the result of this request.
@@ -105,6 +101,13 @@ public class HomeFragment extends Fragment {
         }
 
     }
+
+    private void buildUI() {
+
+        getUserLocation();
+        updateWelcomeBanner();
+    }
+
 
     private void getUserLocation() {
 
@@ -118,29 +121,33 @@ public class HomeFragment extends Fragment {
                         if (location != null) {
                             // Logic to handle location object
                             Log.d("Location", location.toString());
+
+                            updateWeather(location.getLatitude(), location.getLongitude());
                         }
                     }
                 });
 
     }
 
-    private void updateWeather() {
+    private void updateWeather(double latitude, double longitude) {
 
-        String requestURL = buildRequestURL();
+        String requestURL = buildRequestURL(latitude, longitude);
+        Log.d("url", requestURL);
+
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());
         String url = "https://reqres.in/api/users/2";
 
         // Request a string response from the provided URL.
         jsonRequest = new JsonObjectRequest
-                (Request.Method.GET, url, null, new com.android.volley.Response.Listener // CHANGES HERE
+                (Request.Method.GET, requestURL, null, new com.android.volley.Response.Listener // CHANGES HERE
                         <JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         // the response is already constructed as a JSONObject!
                         try {
-                            response = response.getJSONObject("data");
-                            String i = response.getString("email");
+//                            response = response.getJSONObject("current");
+                            String i = response.getString("timezone");
                             Log.d("Email", i);
                             Log.d("jsonRequest", "cancelled");
                             jsonRequest.cancel();
@@ -161,13 +168,17 @@ public class HomeFragment extends Fragment {
         queue.add(jsonRequest);
     }
 
-    private String buildRequestURL() {
+    private String buildRequestURL(double latitude, double longitude) {
 
-        String requestURL = "";
         StringBuilder sb = new StringBuilder();
         sb.append("https://api.openweathermap.org/data/2.5/onecall?");
+        sb.append("lat=").append(latitude);
+        sb.append("&lon=").append(longitude);
+        sb.append("&units=metric");
+        sb.append("&exclude=minutely,hourly,alerts");
+        sb.append("&appid=").append(BuildConfig.WEATHER_API_KEY);
 
-        return requestURL;
+        return sb.toString();
     }
 
     private void updateWelcomeBanner() {
