@@ -55,6 +55,15 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
         mDatabase = FirebaseDatabase.getInstance(databaseURL).getReference();
         mLocations = FirebaseDatabase.getInstance(databaseURL).getReference().child("locations");
 
+        // Inflate the layout for this fragment
+        View v = inflater.inflate(R.layout.fragment_map, container, false);
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
+
         ValueEventListener locationsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -108,10 +117,6 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
 
         mLocations.addValueEventListener(locationsListener);
 
-        // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_map, container, false);
-
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         FloatingActionButton addPointButton = v.findViewById(R.id.addPointButton);
 
 
@@ -122,10 +127,6 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
                 launchCreatePointActivity();
             }
         });
-
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-        }
 
         return v;
     }
