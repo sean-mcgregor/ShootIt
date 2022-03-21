@@ -12,11 +12,20 @@ import android.widget.LinearLayout;
 
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
+
 public class PhotoFragment extends Fragment {
 
     Uri photoUri;
     ImageView imageView;
+    boolean deletable = true;
     boolean deleted = false;
+
+    public PhotoFragment(Uri uri, Boolean deletable) {
+
+        this.photoUri = uri;
+        this.deletable = deletable;
+    }
 
     public PhotoFragment(Uri uri){
         // require a empty public constructor
@@ -30,37 +39,41 @@ public class PhotoFragment extends Fragment {
 
         imageView = (ImageView) v.findViewById(R.id.imageView);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setImageURI(photoUri);
 
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        Glide.with(this).load(photoUri).into(imageView);
+//        imageView.setImageURI(photoUri);
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setCancelable(true);
-                builder.setTitle("Remove Image?");
-                builder.setMessage("Are you sure you want to remove this image?");
-                builder.setPositiveButton("Confirm",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+        if (deletable) {
 
-                                view.setVisibility(View.GONE);
-                                deleted = true;
-                            }
-                        });
-                builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
 
-                    }
-                });
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setCancelable(true);
+                    builder.setTitle("Remove Image?");
+                    builder.setMessage("Are you sure you want to remove this image?");
+                    builder.setPositiveButton("Confirm",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
+                                    view.setVisibility(View.GONE);
+                                    deleted = true;
+                                }
+                            });
+                    builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+            });
+        }
 
         return v;
     }
