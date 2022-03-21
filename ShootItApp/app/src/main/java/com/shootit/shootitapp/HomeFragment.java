@@ -35,6 +35,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -149,7 +150,11 @@ public class HomeFragment extends Fragment {
                         // the response is already constructed as a JSONObject!
                         try {
                             String i = response.getString("timezone");
-                            weatherText.setText(i);
+                            JSONObject current = response.getJSONObject("current");
+                            JSONArray weatherSnapshot = current.getJSONArray("weather");
+                            JSONObject weather = (JSONObject) weatherSnapshot.get(0);
+                            String description = weather.getString("description");
+                            weatherText.setText(description);
                             Log.d("Email", i);
                             Log.d("jsonRequest", "cancelled");
                             jsonRequest.cancel();
