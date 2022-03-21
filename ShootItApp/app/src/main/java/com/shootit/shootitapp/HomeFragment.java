@@ -1,6 +1,7 @@
 package com.shootit.shootitapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -25,7 +26,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -59,6 +59,8 @@ public class HomeFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
         welcomeBanner = (TextView) v.findViewById(R.id.welcome);
+        weatherText = (TextView) v.findViewById(R.id.weatherTextView);
+
         user = FirebaseAuth.getInstance().getCurrentUser();
         mUser = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
 
@@ -109,6 +111,7 @@ public class HomeFragment extends Fragment {
     }
 
 
+    @SuppressLint("MissingPermission")
     private void getUserLocation() {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
@@ -136,7 +139,6 @@ public class HomeFragment extends Fragment {
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());
-        String url = "https://reqres.in/api/users/2";
 
         // Request a string response from the provided URL.
         jsonRequest = new JsonObjectRequest
@@ -146,8 +148,8 @@ public class HomeFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         // the response is already constructed as a JSONObject!
                         try {
-//                            response = response.getJSONObject("current");
                             String i = response.getString("timezone");
+                            weatherText.setText(i);
                             Log.d("Email", i);
                             Log.d("jsonRequest", "cancelled");
                             jsonRequest.cancel();
