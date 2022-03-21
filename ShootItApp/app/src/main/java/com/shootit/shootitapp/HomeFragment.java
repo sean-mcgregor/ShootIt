@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -44,6 +46,7 @@ public class HomeFragment extends Fragment {
     private FirebaseUser user;
     private TextView welcomeBanner;
     private TextView weatherText;
+    private ImageView weatherImage;
     private TextView locationText;
     private DatabaseReference mUser;
     private JsonObjectRequest jsonRequest;
@@ -61,6 +64,7 @@ public class HomeFragment extends Fragment {
 
         welcomeBanner = (TextView) v.findViewById(R.id.welcome);
         weatherText = (TextView) v.findViewById(R.id.weatherTextView);
+        weatherImage = (ImageView) v.findViewById((R.id.weatherImageView));
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         mUser = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
@@ -78,8 +82,8 @@ public class HomeFragment extends Fragment {
         ActivityResultLauncher<String> requestPermissionLauncher =
                 registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) {
-                        // Permission is granted. Continue the action or workflow in your
-                        // app.
+
+                        buildUI();
                     } else {
                         // Explain to the user that the feature is unavailable because the
                         // features requires a permission that the user has denied. At the
@@ -153,8 +157,16 @@ public class HomeFragment extends Fragment {
                             JSONObject current = response.getJSONObject("current");
                             JSONArray weatherSnapshot = current.getJSONArray("weather");
                             JSONObject weather = (JSONObject) weatherSnapshot.get(0);
+
                             String description = weather.getString("description");
-                            weatherText.setText(description);
+                            String weatherIconID = weather.getString("icon");
+                            StringBuilder iconURL = new StringBuilder();
+                            iconURL.append("https://openweathermap.org/img/wn/").append(weatherIconID).append("@2x.png");
+
+                            weatherText.setText(new StringBuilder().append("Current weather: ").append(description).toString());
+                            Glide.with(getContext()).load(iconURL.toString()).into(weatherImage);
+
+
                             Log.d("Email", i);
                             Log.d("jsonRequest", "cancelled");
                             jsonRequest.cancel();
