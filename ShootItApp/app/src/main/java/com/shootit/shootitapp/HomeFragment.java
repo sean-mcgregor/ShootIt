@@ -34,6 +34,7 @@ public class HomeFragment extends Fragment {
     private FirebaseUser user;
     private TextView welcomeBanner;
     private DatabaseReference mUser;
+    JsonObjectRequest jsonRequest;
 
     public HomeFragment(){
         // require a empty public constructor
@@ -65,7 +66,7 @@ public class HomeFragment extends Fragment {
         String url = "https://reqres.in/api/users/2";
 
 // Request a string response from the provided URL.
-        JsonObjectRequest jsonRequest = new JsonObjectRequest
+        jsonRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new com.android.volley.Response.Listener // CHANGES HERE
                         <JSONObject>() {
                     @Override
@@ -75,6 +76,8 @@ public class HomeFragment extends Fragment {
                             response = response.getJSONObject("data");
                             String i = response.getString("email");
                             Log.d("Email", i);
+                            Log.d("jsonRequest", "cancelled");
+                            jsonRequest.cancel();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
