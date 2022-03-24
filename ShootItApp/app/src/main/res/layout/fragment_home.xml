@@ -27,6 +27,17 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="65dp" />
 
+    <TextView
+        android:id="@+id/sevenDayForecast"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:gravity="center"
+        android:text="7-Day Forecast"
+        app:layout_constraintBottom_toTopOf="@+id/weatherScrollView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <HorizontalScrollView
         android:id="@+id/weatherScrollView"
         android:layout_width="match_parent"
@@ -60,7 +71,7 @@
         <TextView
             android:id="@+id/weatherTextView"
             android:layout_width="303dp"
-            android:layout_height="101dp"
+            android:layout_height="100dp"
             android:layout_gravity="right"
             android:gravity="center"
             android:text="TextView" />
