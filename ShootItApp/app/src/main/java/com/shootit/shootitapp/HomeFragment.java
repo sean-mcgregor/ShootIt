@@ -192,7 +192,7 @@ public class HomeFragment extends Fragment {
     private void addDailyWeather(JSONArray daily) throws JSONException {
 
         // Loop through array of days
-        for (int i = 0; i < daily.length(); i++) {
+        for (int i = 1; i < daily.length(); i++) {
 
             // store each object in JSONObject
             JSONObject day = daily.getJSONObject(i);
