@@ -79,6 +79,7 @@ public class HomeFragment extends Fragment {
         return v;
     }
 
+    
     private void handleLocationPermissions() {
 
         // Register the permissions callback, which handles the user's response to the
@@ -114,6 +115,7 @@ public class HomeFragment extends Fragment {
 
     }
 
+
     private void buildUI() {
 
         getUserLocation();
@@ -142,6 +144,7 @@ public class HomeFragment extends Fragment {
 
     }
 
+
     private void updateWeather(double latitude, double longitude) {
 
         String requestURL = buildRequestURL(latitude, longitude);
@@ -159,39 +162,12 @@ public class HomeFragment extends Fragment {
                         // the response is already constructed as a JSONObject!
                         try {
 
+                            // Access current and daily forecasts
                             JSONObject current = response.getJSONObject("current");
-                            JSONArray weatherSnapshot = current.getJSONArray("weather");
-                            JSONObject weather = (JSONObject) weatherSnapshot.get(0);
-
-                            String description = weather.getString("description");
-                            String weatherIconID = weather.getString("icon");
-                            StringBuilder iconURL = new StringBuilder();
-                            iconURL.append("https://openweathermap.org/img/wn/").append(weatherIconID).append("@2x.png");
-
-                            weatherText.setText(new StringBuilder().append("Current weather: ").append(description).toString());
-                            Glide.with(getContext()).load(iconURL.toString()).into(weatherImage);
-
-
-                            // Update daily weather in scrollview
                             JSONArray daily = response.getJSONArray("daily");
 
-                            // Loop through array of days
-                            for (int i = 0; i < daily.length(); i++) {
-
-                                // store each object in JSONObject
-                                JSONObject day = daily.getJSONObject(i);
-                                JSONArray weatherArray = day.getJSONArray("weather");
-                                JSONObject dayWeather = (JSONObject) weatherArray.get(0);
-                                String dayIcon = dayWeather.getString("icon");
-
-                                // get field value from JSONObject using get() method
-                                Log.d("DT", day.get("dt").toString());
-
-                                StringBuilder iconAddress = new StringBuilder();
-                                iconAddress.append("https://openweathermap.org/img/wn/").append(dayIcon).append("@2x.png");
-                                WeatherFragment dayObject = new WeatherFragment(Uri.parse(iconAddress.toString()), day.get("dt").toString());
-                                getParentFragmentManager().beginTransaction().add(R.id.weatherContainer, dayObject).commit();
-                            }
+                            addCurrentWeather(current);
+                            addDailyWeather(daily);
 
                             Log.d("jsonRequest", "cancelled");
                             jsonRequest.cancel();
@@ -210,6 +186,47 @@ public class HomeFragment extends Fragment {
 
         // Add the request to the RequestQueue.
         queue.add(jsonRequest);
+    }
+
+
+    private void addDailyWeather(JSONArray daily) throws JSONException {
+
+        // Loop through array of days
+        for (int i = 0; i < daily.length(); i++) {
+
+            // store each object in JSONObject
+            JSONObject day = daily.getJSONObject(i);
+            JSONArray weatherArray = day.getJSONArray("weather");
+            JSONObject dayWeather = (JSONObject) weatherArray.get(0);
+            String dayIcon = dayWeather.getString("icon");
+
+            // get field value from JSONObject using get() method
+            Log.d("DT", day.get("dt").toString());
+
+            WeatherFragment dayObject = new WeatherFragment(getIconUri(dayIcon), day.get("dt").toString());
+            getParentFragmentManager().beginTransaction().add(R.id.weatherContainer, dayObject).commit();
+        }
+    }
+
+
+    private void addCurrentWeather(JSONObject current) throws JSONException {
+
+        JSONArray weatherSnapshot = current.getJSONArray("weather");
+        JSONObject weather = (JSONObject) weatherSnapshot.get(0);
+
+        String description = weather.getString("description");
+        String weatherIconID = weather.getString("icon");
+
+        weatherText.setText(new StringBuilder().append("Current weather: ").append(description).toString());
+        Glide.with(getContext()).load(getIconUri(weatherIconID).toString()).into(weatherImage);
+    }
+
+
+    private Uri getIconUri(String dayIcon) {
+
+        StringBuilder iconAddress = new StringBuilder();
+        iconAddress.append("https://openweathermap.org/img/wn/").append(dayIcon).append("@2x.png");
+        return Uri.parse(iconAddress.toString());
     }
 
     private String buildRequestURL(double latitude, double longitude) {
