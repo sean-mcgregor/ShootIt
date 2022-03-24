@@ -79,7 +79,7 @@ public class HomeFragment extends Fragment {
         return v;
     }
 
-    
+
     private void handleLocationPermissions() {
 
         // Register the permissions callback, which handles the user's response to the
@@ -237,7 +237,7 @@ public class HomeFragment extends Fragment {
         sb.append("&lon=").append(longitude);
         sb.append("&units=metric");
         sb.append("&exclude=minutely,hourly,alerts");
-        sb.append("&appid=").append(BuildConfig.WEATHER_API_KEY);
+        sb.append("&appid=").append(apiKey);
 
         return sb.toString();
     }
