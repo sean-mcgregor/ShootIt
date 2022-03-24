@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -17,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +51,7 @@ public class HomeFragment extends Fragment {
     private TextView weatherText;
     private ImageView weatherImage;
     private TextView locationText;
+    private LinearLayout weatherContainer;
     private DatabaseReference mUser;
     private JsonObjectRequest jsonRequest;
     private String apiKey = BuildConfig.WEATHER_API_KEY;
@@ -64,7 +68,8 @@ public class HomeFragment extends Fragment {
 
         welcomeBanner = (TextView) v.findViewById(R.id.welcome);
         weatherText = (TextView) v.findViewById(R.id.weatherTextView);
-        weatherImage = (ImageView) v.findViewById((R.id.weatherImageView));
+        weatherImage = (ImageView) v.findViewById(R.id.weatherImageView);
+        weatherContainer = (LinearLayout) v.findViewById(R.id.weatherContainer);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         mUser = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
@@ -153,7 +158,7 @@ public class HomeFragment extends Fragment {
                     public void onResponse(JSONObject response) {
                         // the response is already constructed as a JSONObject!
                         try {
-                            String i = response.getString("timezone");
+
                             JSONObject current = response.getJSONObject("current");
                             JSONArray weatherSnapshot = current.getJSONArray("weather");
                             JSONObject weather = (JSONObject) weatherSnapshot.get(0);
@@ -167,7 +172,27 @@ public class HomeFragment extends Fragment {
                             Glide.with(getContext()).load(iconURL.toString()).into(weatherImage);
 
 
-                            Log.d("Email", i);
+                            // Update daily weather in scrollview
+                            JSONArray daily = response.getJSONArray("daily");
+
+                            // Loop through array of days
+                            for (int i = 0; i < daily.length(); i++) {
+
+                                // store each object in JSONObject
+                                JSONObject day = daily.getJSONObject(i);
+                                JSONArray weatherArray = day.getJSONArray("weather");
+                                JSONObject dayWeather = (JSONObject) weatherArray.get(0);
+                                String dayIcon = dayWeather.getString("icon");
+
+                                // get field value from JSONObject using get() method
+                                Log.d("DT", day.get("dt").toString());
+
+                                StringBuilder iconAddress = new StringBuilder();
+                                iconAddress.append("https://openweathermap.org/img/wn/").append(dayIcon).append("@2x.png");
+                                WeatherFragment dayObject = new WeatherFragment(Uri.parse(iconAddress.toString()), day.get("dt").toString());
+                                getParentFragmentManager().beginTransaction().add(R.id.weatherContainer, dayObject).commit();
+                            }
+
                             Log.d("jsonRequest", "cancelled");
                             jsonRequest.cancel();
                         } catch (JSONException e) {
