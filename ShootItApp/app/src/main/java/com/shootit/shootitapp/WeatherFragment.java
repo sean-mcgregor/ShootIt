@@ -54,7 +54,7 @@ public class WeatherFragment extends Fragment {
 
         Date date = new Date(Long.parseLong(unformatted) * 1000);
 
-        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat DateFor = new SimpleDateFormat("EEE, MMM d");
         String formatted= DateFor.format(date);
 
         return formatted;
