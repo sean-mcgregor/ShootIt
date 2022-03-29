@@ -34,41 +34,52 @@ public class PhotoFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
+        // Define view
         View v = inflater.inflate(R.layout.fragment_photo, null);
 
+        // Access image container
         imageView = (ImageView) v.findViewById(R.id.imageView);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
+        // Load photo from URI into image container
         Glide.with(this).load(photoUri).into(imageView);
-//        imageView.setImageURI(photoUri);
 
+        // If fragment is being used for photo upload in create point activity
         if (deletable) {
 
+            // If user clicks photo fragment
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
+                    // Create alert dialog to confirm deletion
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setCancelable(true);
                     builder.setTitle("Remove Image?");
                     builder.setMessage("Are you sure you want to remove this image?");
-                    builder.setPositiveButton("Confirm",
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
 
-                                    view.setVisibility(View.GONE);
-                                    deleted = true;
-                                }
-                            });
+                    // If user confirms deletion process
+                    builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            // Delete image
+                            view.setVisibility(View.GONE);
+                            deleted = true;
+                        }
+                    });
+
+                    // If user cancels deletion process
                     builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
+                            // Pass
                         }
                     });
 
+                    // Display prompt to user
                     AlertDialog dialog = builder.create();
                     dialog.show();
                 }
