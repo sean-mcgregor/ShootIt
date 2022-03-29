@@ -2,6 +2,7 @@ package com.shootit.shootitapp;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -9,12 +10,21 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -23,6 +33,8 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
     private TextView titleView, descriptionView;
     private Button backButton;
     private GoogleMap googleMap;
+    private JsonObjectRequest jsonRequest;
+    private String apiKey = BuildConfig.WEATHER_API_KEY;
 
     ShootLocation location;
 
@@ -46,6 +58,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
         backButton = (Button) findViewById(R.id.back_button);
         imageContainer = (LinearLayout) findViewById(R.id.imageContainer);
 
+        updateWeather(location.getLatitude(), location.getLongitude());
         titleView.setText(location.getTitle());
         descriptionView.setText(location.getDescription());
 
@@ -93,5 +106,88 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
 
         newPoint = googleMap.addMarker(new MarkerOptions()
                 .position(location.getPosition()));
+    }
+
+
+    private void updateWeather(String latitude, String longitude) {
+
+        String requestURL = buildRequestURL(latitude, longitude);
+        Log.d("url", requestURL);
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+
+        // Request a string response from the provided URL.
+        jsonRequest = new JsonObjectRequest
+                (Request.Method.GET, requestURL, null, new com.android.volley.Response.Listener // CHANGES HERE
+                        <JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // the response is already constructed as a JSONObject!
+                        try {
+
+                            // Access daily forecast
+                            JSONArray daily = response.getJSONArray("daily");
+                            addDailyWeather(daily);
+
+                            Log.d("jsonRequest", "cancelled");
+                            jsonRequest.cancel();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new com.android.volley.Response.ErrorListener () {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d("Crash", "Volle failed");
+                        error.printStackTrace();
+                    }
+                });
+
+        // Add the request to the RequestQueue.
+        queue.add(jsonRequest);
+    }
+
+
+    private String buildRequestURL(String latitude, String longitude) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("https://api.openweathermap.org/data/2.5/onecall?");
+        sb.append("lat=").append(latitude);
+        sb.append("&lon=").append(longitude);
+        sb.append("&units=metric");
+        sb.append("&exclude=minutely,hourly,alerts");
+        sb.append("&appid=").append(apiKey);
+
+        return sb.toString();
+    }
+
+
+    private void addDailyWeather(JSONArray daily) throws JSONException {
+
+        // Loop through array of days
+        for (int i = 0; i < daily.length(); i++) {
+
+            // store each object in JSONObject
+            JSONObject day = daily.getJSONObject(i);
+            JSONArray weatherArray = day.getJSONArray("weather");
+            JSONObject dayWeather = (JSONObject) weatherArray.get(0);
+            String dayIcon = dayWeather.getString("icon");
+
+            // get field value from JSONObject using get() method
+            Log.d("DT", day.get("dt").toString());
+
+            WeatherFragment dayObject = new WeatherFragment(getIconUri(dayIcon), day.get("dt").toString());
+            getSupportFragmentManager().beginTransaction().add(R.id.weatherContainer, dayObject).commit();
+        }
+    }
+
+
+    private Uri getIconUri(String dayIcon) {
+
+        StringBuilder iconAddress = new StringBuilder();
+        iconAddress.append("https://openweathermap.org/img/wn/").append(dayIcon).append("@2x.png");
+        return Uri.parse(iconAddress.toString());
     }
 }
