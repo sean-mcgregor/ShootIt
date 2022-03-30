@@ -9,11 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class CreatePlanActivity extends AppCompatActivity{
 
-
     private TextView locationNameTextView;
     private PhotoFragment photoFragment;
     private Button backButton, confirmButton;
-
     private ShootLocation location;
 
 
