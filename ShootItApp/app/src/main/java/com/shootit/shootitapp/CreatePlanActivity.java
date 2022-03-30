@@ -16,6 +16,8 @@ import android.widget.TimePicker;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
+import java.sql.Time;
+
 public class CreatePlanActivity extends AppCompatActivity{
 
     private TextView locationNameTextView, dateTextView, timeTextView;
@@ -23,6 +25,7 @@ public class CreatePlanActivity extends AppCompatActivity{
     private Button backButton, confirmButton, dateButton, timeButton;
     private ShootLocation location;
     private DatePickerDialog datePickerDialog;
+    private TimePickerDialog timePickerDialog;
     private int chosenMinute, chosenHour, chosenDay, chosenMonth, chosenYear;
 
     @Override
@@ -32,6 +35,7 @@ public class CreatePlanActivity extends AppCompatActivity{
         setContentView(R.layout.activity_create_plan);
 
         initDatePicker();
+        initTimePicker();
 
         locationNameTextView = (TextView) findViewById(R.id.locationNameTextView);
         dateTextView = (TextView) findViewById(R.id.dateTextView);
@@ -81,10 +85,31 @@ public class CreatePlanActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
 
-//                DialogFragment newFragment = new TimePickerFragment();
-//                newFragment.show(getSupportFragmentManager(), "timePicker");
+                timePickerDialog.show();
             }
         });
+    }
+
+    private void initTimePicker() {
+
+        TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(hour).append(":");
+
+                if (minute < 10) {
+
+                    sb.append(0);
+                }
+                
+                sb.append(minute);
+                timeTextView.setText(sb.toString());
+            }
+        };
+
+        timePickerDialog = new TimePickerDialog(this, timeSetListener, 12, 0, true);
     }
 
 
