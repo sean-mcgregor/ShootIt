@@ -36,13 +36,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/locationImageView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="left"
-            app:srcCompat="@android:mipmap/sym_def_app_icon" />
-
         <TextView
             android:id="@+id/locationNameTextView"
             android:layout_width="303dp"
