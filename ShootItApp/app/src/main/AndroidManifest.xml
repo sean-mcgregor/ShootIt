@@ -46,6 +46,11 @@
             android:screenOrientation = "portrait"
             android:label="ShootIt">
         </activity>
+        <activity
+            android:name=".CreatePlanActivity"
+            android:screenOrientation = "portrait"
+            android:label="ShootIt">
+        </activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

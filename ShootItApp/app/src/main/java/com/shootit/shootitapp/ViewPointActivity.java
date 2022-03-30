@@ -1,7 +1,9 @@
 package com.shootit.shootitapp;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,7 +33,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
 
     Marker newPoint;
     private TextView titleView, descriptionView;
-    private Button backButton;
+    private Button backButton, createPlanButton;
     private GoogleMap googleMap;
     private JsonObjectRequest jsonRequest;
     private String apiKey = BuildConfig.WEATHER_API_KEY;
@@ -56,6 +58,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
         titleView = (TextView) findViewById(R.id.locationName);
         descriptionView = (TextView) findViewById(R.id.locationDescription);
         backButton = (Button) findViewById(R.id.back_button);
+        createPlanButton = (Button) findViewById(R.id.createPlanButton);
         imageContainer = (LinearLayout) findViewById(R.id.imageContainer);
 
         updateWeather(location.getLatitude(), location.getLongitude());
@@ -67,6 +70,14 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
             public void onClick(View view) {
 
                 finish();
+            }
+        });
+
+        createPlanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                launchCreatePlanActivity((ShootLocation) location);
             }
         });
 
@@ -82,6 +93,13 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
 
             mapFragment.getMapAsync(this);
         }
+    }
+
+    private void launchCreatePlanActivity(ShootLocation location) {
+
+        Intent planCreatorLauncher = new Intent(getApplicationContext(), CreatePlanActivity.class);
+        planCreatorLauncher.putExtra("location", (Parcelable) location);
+        startActivity(planCreatorLauncher);
     }
 
 
