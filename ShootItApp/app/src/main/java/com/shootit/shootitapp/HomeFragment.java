@@ -44,13 +44,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class HomeFragment extends Fragment {
 
     private FirebaseUser user;
     private TextView welcomeBanner;
     private TextView weatherText;
     private ImageView weatherImage;
-    private TextView locationText;
+    private TextView sunText;
     private LinearLayout weatherContainer;
     private DatabaseReference mUser;
     private JsonObjectRequest jsonRequest;
@@ -68,6 +71,7 @@ public class HomeFragment extends Fragment {
 
         welcomeBanner = (TextView) v.findViewById(R.id.welcome);
         weatherText = (TextView) v.findViewById(R.id.weatherTextView);
+        sunText = (TextView) v.findViewById(R.id.sunRiseSetTextView);
         weatherImage = (ImageView) v.findViewById(R.id.weatherImageView);
         weatherContainer = (LinearLayout) v.findViewById(R.id.weatherContainer);
 
@@ -141,7 +145,6 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 });
-
     }
 
 
@@ -164,10 +167,13 @@ public class HomeFragment extends Fragment {
 
                             // Access current and daily forecasts
                             JSONObject current = response.getJSONObject("current");
+                            String sunriseTime = current.get("sunrise").toString();
+                            String sunsetTime = current.get("sunset").toString();
                             JSONArray daily = response.getJSONArray("daily");
 
                             addCurrentWeather(current);
                             addDailyWeather(daily);
+                            addSunTimes(sunriseTime, sunsetTime);
 
                             Log.d("jsonRequest", "cancelled");
                             jsonRequest.cancel();
@@ -186,6 +192,28 @@ public class HomeFragment extends Fragment {
 
         // Add the request to the RequestQueue.
         queue.add(jsonRequest);
+    }
+
+    private void addSunTimes(String sunriseTime, String sunsetTime) {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Sunrise is at ");
+        sb.append(formatTime(sunriseTime));
+        sb.append(" and sunset is at ");
+        sb.append(formatTime(sunsetTime));
+
+        sunText.setText(sb.toString());
+    }
+
+
+    private String formatTime(String unformatted) {
+
+        Date date = new Date(Long.parseLong(unformatted) * 1000);
+
+        SimpleDateFormat DateFor = new SimpleDateFormat("h:mm a");
+        String formatted= DateFor.format(date);
+
+        return formatted;
     }
 
 
