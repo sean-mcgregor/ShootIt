@@ -134,7 +134,6 @@ public class CreatePlanActivity extends AppCompatActivity{
                     .child(randomID)
                     .child("time")
                     .setValue(timeTextView.getText());
-
     }
 
     private void initTimePicker() {
