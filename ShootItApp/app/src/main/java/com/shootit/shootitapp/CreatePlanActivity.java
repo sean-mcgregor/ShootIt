@@ -16,7 +16,13 @@ import android.widget.TimePicker;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.sql.Time;
+import java.util.UUID;
 
 public class CreatePlanActivity extends AppCompatActivity{
 
@@ -26,7 +32,9 @@ public class CreatePlanActivity extends AppCompatActivity{
     private ShootLocation location;
     private DatePickerDialog datePickerDialog;
     private TimePickerDialog timePickerDialog;
-    private int chosenMinute, chosenHour, chosenDay, chosenMonth, chosenYear;
+    private boolean dateSelected, timeSelected;
+    private DatabaseReference mDatabase;
+    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +53,9 @@ public class CreatePlanActivity extends AppCompatActivity{
         confirmButton = (Button) findViewById(R.id.confirm_button);
         dateButton = (Button) findViewById(R.id.dateButton);
         timeButton = (Button) findViewById(R.id.timeButton);
+
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         // Get location for plan
         if(getIntent().getExtras() != null) {
@@ -69,7 +80,10 @@ public class CreatePlanActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
 
-                finish();
+                if (dateSelected && timeSelected) {
+
+                    pushPlanToDatabase();
+                }
             }
         });
 
@@ -90,6 +104,39 @@ public class CreatePlanActivity extends AppCompatActivity{
         });
     }
 
+    private void pushPlanToDatabase() {
+
+        dateTextView.getText();
+        timeTextView.getText();
+
+        String randomID = UUID.randomUUID().toString();
+
+        StringBuilder locationDatabaseID = new StringBuilder();
+        locationDatabaseID.append(location.getLatitude()).append(location.getLongitude());
+
+        mDatabase   .child("users")
+                    .child(user.getUid())
+                    .child("plans")
+                    .child(randomID)
+                    .child("location")
+                    .setValue(locationDatabaseID.toString().replace(".", "dot"));
+
+        mDatabase   .child("users")
+                    .child(user.getUid())
+                    .child("plans")
+                    .child(randomID)
+                    .child("date")
+                    .setValue(dateTextView.getText());
+
+        mDatabase   .child("users")
+                    .child(user.getUid())
+                    .child("plans")
+                    .child(randomID)
+                    .child("time")
+                    .setValue(timeTextView.getText());
+
+    }
+
     private void initTimePicker() {
 
         TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
@@ -97,6 +144,12 @@ public class CreatePlanActivity extends AppCompatActivity{
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
 
                 StringBuilder sb = new StringBuilder();
+
+                if (hour < 10) {
+
+                    sb.append(0);
+                }
+
                 sb.append(hour).append(":");
 
                 if (minute < 10) {
@@ -106,6 +159,7 @@ public class CreatePlanActivity extends AppCompatActivity{
                 
                 sb.append(minute);
                 timeTextView.setText(sb.toString());
+                timeSelected = true;
             }
         };
 
@@ -124,6 +178,7 @@ public class CreatePlanActivity extends AppCompatActivity{
                 sb.append(month+1).append("/");
                 sb.append(year);
                 dateTextView.setText(sb.toString());
+                dateSelected = true;
             }
         };
 
@@ -136,24 +191,4 @@ public class CreatePlanActivity extends AppCompatActivity{
         datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
     }
-
-//    // Static class for Time Picker
-//    public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
-//
-//        @Override
-//        public Dialog onCreateDialog(Bundle savedInstanceState) {
-//            // Use the current time as the default values for the picker
-//            final Calendar c = Calendar.getInstance();
-//            int hour = c.get(Calendar.HOUR_OF_DAY);
-//            int minute = c.get(Calendar.MINUTE);
-//
-//            // Create a new instance of TimePickerDialog and return it
-//            return new TimePickerDialog(getActivity(), this, hour, minute,
-//                    DateFormat.is24HourFormat(getActivity()));
-//        }
-//
-//        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-//            // Do something with the time chosen by the user
-//        }
-//    }
 }
