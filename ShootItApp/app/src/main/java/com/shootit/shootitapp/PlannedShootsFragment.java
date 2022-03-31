@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -24,6 +25,7 @@ import java.util.List;
 
 public class PlannedShootsFragment extends Fragment {
 
+    private TextView noPlansText;
     private LinearLayout planListLinearLayout;
     private DatabaseReference mShootPlans, mLocations;
     private FirebaseUser user;
@@ -39,6 +41,7 @@ public class PlannedShootsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_planned_shoots, container, false);
 
         planListLinearLayout = (LinearLayout) v.findViewById(R.id.planListLinearLayout);
+        noPlansText = (TextView) v.findViewById(R.id.noPlansText);
         user = FirebaseAuth.getInstance().getCurrentUser();
         mShootPlans = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("plans");
         mLocations = FirebaseDatabase.getInstance().getReference().child("locations");
@@ -50,6 +53,7 @@ public class PlannedShootsFragment extends Fragment {
 
                 for (DataSnapshot plan : plansList.getChildren()) {
 
+                    noPlansText.setVisibility(View.GONE);
                     String locationUID = plan.child("location").getValue().toString();
                     fetchLocationFromDatabase(locationUID, plan);
                 }
@@ -77,7 +81,6 @@ public class PlannedShootsFragment extends Fragment {
 
         PlanCardView fragment = new PlanCardView(location, date, time);
         getParentFragmentManager().beginTransaction().add(R.id.planListLinearLayout, fragment).commit();
-        fragment = null;
     }
 
     private void fetchLocationFromDatabase(String locationUID, DataSnapshot plan) {
