@@ -42,6 +42,7 @@ public class CreatePlanActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_plan);
 
+        // Configure date and time pickers
         initDatePicker();
         initTimePicker();
 
@@ -57,39 +58,54 @@ public class CreatePlanActivity extends AppCompatActivity{
         mDatabase = FirebaseDatabase.getInstance().getReference();
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-        // Get location for plan
+        // Get bundled location for plan
         if(getIntent().getExtras() != null) {
 
             location = getIntent().getParcelableExtra("location");
 
             locationNameTextView.setText(location.getTitle());
 
+            // Add locations first photo to plan preview
             photoFragment = new PhotoFragment(location.getImages().get(0), false);
+
+            // Add photofragment to cardview
             getSupportFragmentManager().beginTransaction().add(R.id.cardView, photoFragment).commit();
         }
 
+
+        // When back button is clicked close fragment
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                // End Activity
                 finish();
             }
         });
 
+
+        // When confirm button is clicked
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+
+                // Check if user has indicated both a date and time
                 if (dateSelected && timeSelected) {
 
+                    // Save plan on firebase
                     pushPlanToDatabase();
                 }
 
+                // End activity
                 finish();
             }
         });
 
+
+        // When date selector button is clicked
         dateButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
 
@@ -97,7 +113,10 @@ public class CreatePlanActivity extends AppCompatActivity{
             }
         });
 
+
+        // When time selector button is clicked
         timeButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
 
@@ -106,16 +125,22 @@ public class CreatePlanActivity extends AppCompatActivity{
         });
     }
 
+
+    // Saving plan details on Firebase
     private void pushPlanToDatabase() {
 
+        // Get date and time selected by user
         dateTextView.getText();
         timeTextView.getText();
 
+        // Generate random ID to save plan under
         String randomID = UUID.randomUUID().toString();
 
+        // Foreign key for location object
         StringBuilder locationDatabaseID = new StringBuilder();
         locationDatabaseID.append(location.getLatitude()).append(location.getLongitude());
 
+        // Push location key
         mDatabase   .child("users")
                     .child(user.getUid())
                     .child("plans")
@@ -123,6 +148,7 @@ public class CreatePlanActivity extends AppCompatActivity{
                     .child("location")
                     .setValue(locationDatabaseID.toString().replace(".", "dot"));
 
+        // Push date
         mDatabase   .child("users")
                     .child(user.getUid())
                     .child("plans")
@@ -130,6 +156,7 @@ public class CreatePlanActivity extends AppCompatActivity{
                     .child("date")
                     .setValue(dateTextView.getText());
 
+        // Push time
         mDatabase   .child("users")
                     .child(user.getUid())
                     .child("plans")
@@ -138,9 +165,13 @@ public class CreatePlanActivity extends AppCompatActivity{
                     .setValue(timeTextView.getText());
     }
 
+
+    // Configure time picker dialog
     private void initTimePicker() {
 
         TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+
+            // Code to execute when time selected
             @Override
             public void onTimeSet(TimePicker timePicker, int hour, int minute) {
 
@@ -168,9 +199,12 @@ public class CreatePlanActivity extends AppCompatActivity{
     }
 
 
+    // Configure date picker dialog
     private void initDatePicker() {
 
         DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+
+            // Code to execute when date selected
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
 
@@ -178,6 +212,7 @@ public class CreatePlanActivity extends AppCompatActivity{
                 sb.append(day).append("/");
                 sb.append(month+1).append("/");
                 sb.append(year);
+
                 dateTextView.setText(sb.toString());
                 dateSelected = true;
             }
@@ -190,6 +225,8 @@ public class CreatePlanActivity extends AppCompatActivity{
         int day = c.get(Calendar.DAY_OF_MONTH);
 
         datePickerDialog = new DatePickerDialog(this, dateSetListener, year, month, day);
+
+        // Prevent users from selecting a date in the past
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
     }
 }
