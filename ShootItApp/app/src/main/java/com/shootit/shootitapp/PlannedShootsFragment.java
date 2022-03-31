@@ -1,17 +1,32 @@
 package com.shootit.shootitapp;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.List;
 
 public class PlannedShootsFragment extends Fragment {
 
     private LinearLayout planListLinearLayout;
+    private DatabaseReference mShootPlans, mLocations;
+    private FirebaseUser user;
 
     public PlannedShootsFragment(){
         // require a empty public constructor
@@ -24,7 +39,80 @@ public class PlannedShootsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_planned_shoots, container, false);
 
         planListLinearLayout = (LinearLayout) v.findViewById(R.id.planListLinearLayout);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        mShootPlans = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid()).child("plans");
+        mLocations = FirebaseDatabase.getInstance().getReference().child("locations");
+
+        ValueEventListener shootPlansListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot plansList) {
+                // Get Post object and use the values to update the UI
+
+                for (DataSnapshot plan : plansList.getChildren()) {
+
+                    String locationUID = plan.child("location").getValue().toString();
+                    fetchLocationFromDatabase(locationUID, plan);
+                }
+
+                mShootPlans.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+
+        mShootPlans.addValueEventListener(shootPlansListener);
 
         return v;
+    }
+
+
+    private void addPlanToList(DataSnapshot plan, ShootLocation location) {
+
+        // TODO: handle the post
+        String date = plan.child("date").getValue().toString();
+        String time = plan.child("time").getValue().toString();
+
+        PlanCardView fragment = new PlanCardView(location, date, time);
+        getParentFragmentManager().beginTransaction().add(R.id.planListLinearLayout, fragment).commit();
+        fragment = null;
+    }
+
+    private void fetchLocationFromDatabase(String locationUID, DataSnapshot plan) {
+
+        ShootLocation location = new ShootLocation();
+
+        mLocations.child(locationUID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot locationSnapshot) {
+                // ...
+                location.setAuthor(locationSnapshot.child("author").getValue().toString());
+                location.setTitle(locationSnapshot.child("title").getValue().toString());
+                location.setDescription(locationSnapshot.child("description").getValue().toString());
+                location.setLatitude(locationSnapshot.child("latitude").getValue().toString());
+                location.setLongitude(locationSnapshot.child("longitude").getValue().toString());
+                location.setPosition(new LatLng(
+                        Double.parseDouble(location.getLatitude()),
+                        Double.parseDouble(location.getLongitude())
+                ));
+
+                locationSnapshot.child("images").getChildren().forEach(child -> {
+
+                    Uri imageURI = Uri.parse(child.getValue().toString());
+                    List<Uri> images = location.getImages();
+                    images.add(imageURI);
+                    location.setImages(images);
+                });
+
+                addPlanToList(plan, location);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // ...
+            }
+        });
     }
 }
