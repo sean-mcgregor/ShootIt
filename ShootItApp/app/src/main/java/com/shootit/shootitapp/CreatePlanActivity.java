@@ -84,6 +84,8 @@ public class CreatePlanActivity extends AppCompatActivity{
 
                     pushPlanToDatabase();
                 }
+
+                finish();
             }
         });
 
