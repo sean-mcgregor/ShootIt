@@ -22,7 +22,6 @@ public class PlanCardView extends Fragment {
 
     private ShootLocation location;
     private PhotoFragment photoContainer;
-    private LinearLayout fragmentContainer;
     private String date, time;
     private TextView locationTextView, dateTextView, timeTextView;
 
@@ -40,7 +39,6 @@ public class PlanCardView extends Fragment {
         View v = inflater.inflate(R.layout.cardview_plan, null);
 
         photoContainer = new PhotoFragment(location.getImages().get(0), false);
-        fragmentContainer = (LinearLayout) v.findViewById(R.id.locationImageView);
         locationTextView = (TextView) v.findViewById(R.id.titleTextView);
         timeTextView = (TextView) v.findViewById(R.id.timeTextView);
         dateTextView = (TextView) v.findViewById(R.id.dateTextView);
