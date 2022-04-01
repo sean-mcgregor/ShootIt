@@ -73,13 +73,13 @@ public class PlannedShootsFragment extends Fragment {
     }
 
 
-    private void addPlanToList(DataSnapshot plan, ShootLocation location) {
+    private void addPlanToList(DataSnapshot plan, ShootLocation location, DatabaseReference planRef) {
 
         // TODO: handle the post
         String date = plan.child("date").getValue().toString();
         String time = plan.child("time").getValue().toString();
 
-        PlanCardView fragment = new PlanCardView(location, date, time);
+        PlanCardView fragment = new PlanCardView(location, date, time, planRef);
         getParentFragmentManager().beginTransaction().add(R.id.planListLinearLayout, fragment).commit();
     }
 
@@ -109,7 +109,7 @@ public class PlannedShootsFragment extends Fragment {
                     location.setImages(images);
                 });
 
-                addPlanToList(plan, location);
+                addPlanToList(plan, location, mShootPlans.child(plan.getKey()));
             }
 
             @Override
