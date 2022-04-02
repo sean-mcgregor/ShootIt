@@ -75,19 +75,23 @@
         android:layout_height="wrap_content"
         android:text="Log Out"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/register_button"
-        app:layout_constraintTop_toBottomOf="@+id/usernameText"
-        tools:layout_editor_absoluteX="157dp" />
+        app:layout_constraintBottom_toTopOf="@+id/deleteAccountButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/usernameText" />
 
     <Button
-        android:id="@+id/register_button"
+        android:id="@+id/deleteAccountButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:text="Or Register Here"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logout_button"
-        tools:layout_editor_absoluteX="118dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logout_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
