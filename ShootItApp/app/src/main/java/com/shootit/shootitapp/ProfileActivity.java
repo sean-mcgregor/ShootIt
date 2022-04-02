@@ -40,7 +40,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void updateUI() {
 
         StringBuilder emailField = new StringBuilder();
-        emailField.append("Email: ").append(user.getEmail());
+        emailField.append("Email: \n").append(user.getEmail());
 
         emailText.setText(emailField.toString());
 
@@ -54,7 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Log.d("firebase", String.valueOf(task.getResult().getValue()));
 
                     StringBuilder usernameField = new StringBuilder();
-                    usernameField.append("Username: ").append(task.getResult().getValue());
+                    usernameField.append("Username: \n").append(task.getResult().getValue());
                     usernameText.setText(usernameField.toString());
                 }
             }
