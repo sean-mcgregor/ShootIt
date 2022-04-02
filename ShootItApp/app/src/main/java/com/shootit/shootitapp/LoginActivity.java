@@ -37,8 +37,8 @@ public class LoginActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         final Button registerButton = findViewById(R.id.register_button);
         final Button loginButton = findViewById(R.id.login_button);
-        emailInput = findViewById(R.id.emailInput);
-        passwordInput = findViewById(R.id.passwordInput);
+        emailInput = findViewById(R.id.emailText);
+        passwordInput = findViewById(R.id.usernameText);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
 
