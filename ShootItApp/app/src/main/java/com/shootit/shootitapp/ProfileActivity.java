@@ -55,6 +55,7 @@ public class ProfileActivity extends AppCompatActivity {
                 if (firebaseAuth.getCurrentUser() == null){
 
                     Log.d("Logged out", "success");
+                    
                     // Once signout is complete, reboot application to login screen
                     Intent intent = buildIntent();
                     ProcessPhoenix.triggerRebirth(getApplicationContext(), intent);
@@ -85,7 +86,7 @@ public class ProfileActivity extends AppCompatActivity {
         return intent;
     }
 
-    
+
     private void updateUI() {
 
         StringBuilder emailField = new StringBuilder();
