@@ -20,9 +20,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add Image"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/horizontalScrollView"
-        app:layout_constraintTop_toBottomOf="@+id/map"
-        tools:layout_editor_absoluteX="146dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map" />
 
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView"
@@ -68,6 +71,7 @@
         android:layout_marginStart="8dp"
         android:backgroundTint="@color/BACK_BUTTON"
         android:text="Back"
+        android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -78,6 +82,7 @@
         android:layout_marginEnd="8dp"
         android:singleLine="true"
         android:text="Confirm"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

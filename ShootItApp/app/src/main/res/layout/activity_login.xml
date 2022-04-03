@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:text="Or Register Here"
-        android:textColor="@color/black"
+        android:textColor="@color/BROWN"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/usernameText"
         app:layout_constraintHorizontal_bias="0.5"

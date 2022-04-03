@@ -82,6 +82,7 @@
         android:layout_height="45dp"
         android:layout_marginStart="8dp"
         android:backgroundTint="@color/BACK_BUTTON"
+        android:textColor="@color/white"
         android:text="Back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -92,6 +93,7 @@
         android:layout_width="wrap_content"
         android:layout_marginEnd="8dp"
         android:text="New Plan"
+        android:textColor="@color/white"
         android:singleLine="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
