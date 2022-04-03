@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="100dp"
     android:layout_height="100dp"
+    android:padding="2dp"
     tools:context=".MainActivity">
 
     <ImageView
