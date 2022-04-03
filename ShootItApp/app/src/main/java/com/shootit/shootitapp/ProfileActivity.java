@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +29,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -101,8 +104,126 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        editEmailButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                changeEmailPrompt();
+            }
+        });
+
         // Populate screen with user-specific content
         updateUI();
+    }
+
+    private void changeEmailPrompt() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter your password to re-authenticate yourself");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("Password");
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String password = input.getText().toString();
+
+                AuthCredential credential = EmailAuthProvider
+                        .getCredential(user.getEmail(), password);
+
+                // Prompt the user to re-provide their sign-in credentials
+                user.reauthenticate(credential)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+
+                                if (task.isSuccessful()){
+
+                                    getNewEmail();
+                                    Log.d(TAG, "User re-authenticated.");
+                                } else {
+
+                                    Log.d(TAG, "User authentication failure");
+                                    Toast.makeText(getApplicationContext(), "Your re-authentication has failed. Please try again.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+
+            }
+        });
+
+        // Configure cancel button for dialog window
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Display dialog window
+        builder.show();
+    }
+
+    private void getNewEmail() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter your new email address");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        input.setHint("New Email");
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String newEmail = input.getText().toString();
+
+                // Attempt to update user email
+                user.updateEmail(newEmail).addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()) {
+
+                            Log.d(TAG, "User email address updated.");
+                            userRef.child("email").setValue(newEmail);
+                            Toast.makeText(getApplicationContext(), "Your email has been updated.", Toast.LENGTH_LONG).show();
+                            updateUI();
+                        } else {
+
+                            Toast.makeText(getApplicationContext(), "Email update failed. Please try again.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+            }
+        });
+
+        // Configure cancel button for dialog window
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Display dialog window
+        builder.show();
     }
 
 
