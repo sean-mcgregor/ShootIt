@@ -9,11 +9,6 @@ import java.util.regex.Pattern;
 
 public class CheckInputs {
 
-    public static boolean isValidEmail (String input) {
-
-        return false;
-    }
-
     public static boolean isValidUsername (String input) {
 
         Pattern pattern = Pattern.compile("^(?=[a-zA-Z0-9._]{8,20}$)(?!.*[_.]{2})[^_.].*[^_.]$");

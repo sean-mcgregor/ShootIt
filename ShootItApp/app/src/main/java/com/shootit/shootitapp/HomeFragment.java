@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,6 +68,7 @@ public class HomeFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
@@ -82,6 +82,7 @@ public class HomeFragment extends Fragment {
         user = FirebaseAuth.getInstance().getCurrentUser();
         mUser = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
 
+        // Launch profile activity
         profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,11 +91,14 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        // Prompt user for location access
         handleLocationPermissions();
 
         return v;
     }
 
+
+    // Launch profile activity
     private void launchProfileActivity() {
 
         Intent ProfileActivityLauncher = new Intent(getContext(), ProfileActivity.class);
@@ -102,23 +106,19 @@ public class HomeFragment extends Fragment {
     }
 
 
+    // Request location access from user
     private void handleLocationPermissions() {
 
-        // Register the permissions callback, which handles the user's response to the
-        // system permissions dialog. Save the return value, an instance of
-        // ActivityResultLauncher, as an instance variable.
+        // Configure request permission launcher
         ActivityResultLauncher<String> requestPermissionLauncher =
                 registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (isGranted) {
 
+                        // If user grants permission then populate UI with content
                         buildUI();
                     } else {
-                        // Explain to the user that the feature is unavailable because the
-                        // features requires a permission that the user has denied. At the
-                        // same time, respect the user's decision. Don't link to system
-                        // settings in an effort to convince the user to change their
-                        // decision.
 
+                        // Else explain that ShootIt relies heavily on location
                         Toast.makeText(getContext(), "Many features unavailable without permission being granted.", Toast.LENGTH_LONG).show();
                     }
                 });
@@ -126,18 +126,20 @@ public class HomeFragment extends Fragment {
         if (ContextCompat.checkSelfPermission(
                 getContext(), Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) {
-            // You can use the API that requires the permission.
+
+            // If permission already granted, proceed
             Log.d("Permissions", "granted");
             buildUI();
         } else {
-            // You can directly ask for the permission.
-            // The registered ActivityResultCallback gets the result of this request.
+
+            // Else request permission using the launcher previously configured
             requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
         }
 
     }
 
 
+    // Populate UI with data
     private void buildUI() {
 
         getUserLocation();
@@ -145,6 +147,7 @@ public class HomeFragment extends Fragment {
     }
 
 
+    // Gets user current location, for weather forecast
     @SuppressLint("MissingPermission")
     private void getUserLocation() {
 
@@ -154,11 +157,10 @@ public class HomeFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            // Logic to handle location object
-                            Log.d("Location", location.toString());
 
+                        if (location != null) {
+
+                            Log.d("Location", location.toString());
                             updateWeather(location.getLatitude(), location.getLongitude());
                         }
                     }
@@ -166,23 +168,22 @@ public class HomeFragment extends Fragment {
     }
 
 
+    // Uses OpenWeatherMap api to get weather forecast and solar pattern
     private void updateWeather(double latitude, double longitude) {
 
         String requestURL = buildRequestURL(latitude, longitude);
         Log.d("url", requestURL);
 
-        // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(getContext());
 
-        // Request a string response from the provided URL.
+        // Request a string response from the provided URL
         jsonRequest = new JsonObjectRequest
                 (Request.Method.GET, requestURL, null, new com.android.volley.Response.Listener // CHANGES HERE
                         <JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        // the response is already constructed as a JSONObject!
-                        try {
 
+                        try {
                             // Access current and daily forecasts
                             JSONObject current = response.getJSONObject("current");
                             String sunriseTime = current.get("sunrise").toString();
@@ -212,6 +213,8 @@ public class HomeFragment extends Fragment {
         queue.add(jsonRequest);
     }
 
+
+    // Update solar pattern on UI
     private void addSunTimes(String sunriseTime, String sunsetTime) {
 
         StringBuilder sb = new StringBuilder();
@@ -224,6 +227,7 @@ public class HomeFragment extends Fragment {
     }
 
 
+    // Formats date from epoch, as provided by api, to human readable
     private String formatTime(String unformatted) {
 
         Date date = new Date(Long.parseLong(unformatted) * 1000);
@@ -235,6 +239,7 @@ public class HomeFragment extends Fragment {
     }
 
 
+    // Populate UI with week-long forecast
     private void addDailyWeather(JSONArray daily) throws JSONException {
 
         // Loop through array of days
@@ -255,6 +260,7 @@ public class HomeFragment extends Fragment {
     }
 
 
+    // Update UI with current weather
     private void addCurrentWeather(JSONObject current) throws JSONException {
 
         JSONArray weatherSnapshot = current.getJSONArray("weather");
@@ -268,6 +274,7 @@ public class HomeFragment extends Fragment {
     }
 
 
+    // Get resource for weather image
     private Uri getIconUri(String dayIcon) {
 
         StringBuilder iconAddress = new StringBuilder();
@@ -275,6 +282,8 @@ public class HomeFragment extends Fragment {
         return Uri.parse(iconAddress.toString());
     }
 
+
+    // Build URL for weather api request
     private String buildRequestURL(double latitude, double longitude) {
 
         StringBuilder sb = new StringBuilder();
@@ -288,6 +297,8 @@ public class HomeFragment extends Fragment {
         return sb.toString();
     }
 
+
+    // Update with users name
     private void updateWelcomeBanner() {
 
         mUser.child("username").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
