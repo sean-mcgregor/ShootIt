@@ -90,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void login(String email, String password) {
 
-        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.signInWithEmailAndPassword(email.replaceAll("\\s+",""), password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
 
             public void onComplete(@NonNull Task<AuthResult> task) {
