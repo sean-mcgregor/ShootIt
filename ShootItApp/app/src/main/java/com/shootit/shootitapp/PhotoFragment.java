@@ -8,6 +8,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,10 +116,16 @@ public class PhotoFragment extends Fragment {
     public void showImagePopup() {
 
         // Crate and configure dialog builder
-        Dialog builder = new Dialog(getContext(), android.R.style.Theme_Translucent_NoTitleBar_Fullscreen);
+        Dialog builder = new Dialog(getContext(), android.R.style.Theme_DeviceDefault_DayNight);
         builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        TypedValue typedValue = new TypedValue();
+        getActivity().getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+        int color = typedValue.data;
+
+
         builder.getWindow().setBackgroundDrawable(
-                new ColorDrawable(getResources().getColor(R.color.design_default_color_on_primary)));
+                new ColorDrawable(color));
 
         // Destroy dialog if dismissed
         builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
