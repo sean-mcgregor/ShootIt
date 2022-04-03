@@ -47,7 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseUser user;
     private DatabaseReference userRef, takenUsernamesRef;
-    private Button logoutButton, deleteAccountButton, editUsernameButton, editEmailButton;
+    private Button logoutButton, deleteAccountButton, changePasswordButton, editUsernameButton, editEmailButton;
 
     TextView emailText, usernameText;
 
@@ -67,6 +67,7 @@ public class ProfileActivity extends AppCompatActivity {
         deleteAccountButton = findViewById(R.id.deleteAccountButton);
         editEmailButton = findViewById(R.id.editEmailButton);
         editUsernameButton = findViewById(R.id.editUsernameButton);
+        changePasswordButton = findViewById(R.id.changePasswordButton);
 
         FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -112,8 +113,163 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        changePasswordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                changePasswordPrompt();
+            }
+        });
+
         // Populate screen with user-specific content
         updateUI();
+    }
+
+    private void changePasswordPrompt() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter your current password to re-authenticate yourself");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("Current Password");
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String password = input.getText().toString();
+
+                AuthCredential credential = EmailAuthProvider
+                        .getCredential(user.getEmail(), password);
+
+                // Prompt the user to re-provide their sign-in credentials
+                user.reauthenticate(credential)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+
+                                if (task.isSuccessful()){
+
+                                    getNewPassword();
+                                    Log.d(TAG, "User re-authenticated.");
+                                } else {
+
+                                    Log.d(TAG, "User authentication failure");
+                                    Toast.makeText(getApplicationContext(), "Your re-authentication has failed.\nPlease try again.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+
+            }
+        });
+
+        // Configure cancel button for dialog window
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Display dialog window
+        builder.show();
+    }
+
+    private void getNewPassword() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter your new password");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("New Password");
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String password = input.getText().toString();
+
+                confirmNewPassword(password);
+            }
+        });
+
+        // Configure cancel button for dialog window
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Display dialog window
+        builder.show();
+    }
+
+    private void confirmNewPassword(String password1) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirm New Password");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("Confirm password");
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String password2 = input.getText().toString();
+
+                if (password1.equals(password2)) {
+
+                    user.updatePassword(password1)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                    if (task.isSuccessful()) {
+
+                                        Log.d(TAG, "User password updated.");
+                                        Toast.makeText(getApplicationContext(), "Password successfully changed.", Toast.LENGTH_LONG).show();
+                                    } else {
+
+                                        Log.d(TAG, "User password updated.");
+                                        Toast.makeText(getApplicationContext(), "Failed to change password.\nPlease try again.", Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            });
+
+                }
+            }
+        });
+
+        // Configure cancel button for dialog window
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Display dialog window
+        builder.show();
     }
 
     private void changeEmailPrompt() {
