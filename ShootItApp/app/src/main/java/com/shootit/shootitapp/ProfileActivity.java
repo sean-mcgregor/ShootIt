@@ -46,8 +46,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private FirebaseUser user;
-    private DatabaseReference userRef, takenUsernamesRef;
-    private Button logoutButton, deleteAccountButton, changePasswordButton, editUsernameButton, editEmailButton;
+    private DatabaseReference userRef, takenUsernamesRef,locationsRef;
+    private Button logoutButton, deleteAccountButton, changePasswordButton, editUsernameButton, editEmailButton, backButton;
 
     TextView emailText, usernameText;
 
@@ -59,6 +59,7 @@ public class ProfileActivity extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
         takenUsernamesRef = FirebaseDatabase.getInstance().getReference().child("takenusernames");
+        locationsRef = FirebaseDatabase.getInstance().getReference().child("locations");
         auth = FirebaseAuth.getInstance();
 
         emailText = findViewById(R.id.emailText);
@@ -68,6 +69,7 @@ public class ProfileActivity extends AppCompatActivity {
         editEmailButton = findViewById(R.id.editEmailButton);
         editUsernameButton = findViewById(R.id.editUsernameButton);
         changePasswordButton = findViewById(R.id.changePasswordButton);
+        backButton = findViewById(R.id.back_button);
 
         FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -121,8 +123,191 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        deleteAccountButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                showConfirmDeleteDialog();
+            }
+        });
+
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                finish();
+            }
+        });
+
         // Populate screen with user-specific content
         updateUI();
+    }
+
+    private void showConfirmDeleteDialog() {
+
+        // Create alert dialog to confirm deletion
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle("Delete Account?");
+        builder.setMessage("Are you sure you want to delete your account?\n" +
+                "This action cannot be undone and all your information including plans and shoot locations will be permanently destroyed.");
+
+        // If user confirms deletion process
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Prompt user to confirm deletion
+                authenticateForAccountDeletion();
+            }
+        });
+
+        // If user cancels deletion process
+        builder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                // Pass
+            }
+        });
+
+        // Display prompt to user
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void authenticateForAccountDeletion() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter your current password to re-authenticate yourself");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("Password");
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String password = input.getText().toString();
+
+                AuthCredential credential = EmailAuthProvider
+                        .getCredential(user.getEmail(), password);
+
+                // Prompt the user to re-provide their sign-in credentials
+                user.reauthenticate(credential)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+
+                                if (task.isSuccessful()){
+
+                                    typeDeleteDialog();
+                                    Log.d(TAG, "User re-authenticated.");
+                                } else {
+
+                                    Log.d(TAG, "User authentication failure");
+                                    Toast.makeText(getApplicationContext(), "Your re-authentication has failed.\nPlease try again.", Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        });
+
+            }
+        });
+
+        // Configure cancel button for dialog window
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Display dialog window
+        builder.show();
+    }
+
+    private void typeDeleteDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Type CONFIRM-DELETE to permanently delete your account.\nThis CANNOT be undone.");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setHint("CONFIRM-DELETE");
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Permanently Delete Account", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String confirmation = input.getText().toString();
+
+                if (confirmation.equals("CONFIRM-DELETE")) {
+
+                    deleteAllUserData();
+                }
+
+            }
+        });
+
+        // Configure cancel button for dialog window
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Display dialog window
+        builder.show();
+    }
+
+    private void deleteAllUserData() {
+
+        userRef.child("locations").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot locationsSnapshot) {
+
+
+                locationsSnapshot.getChildren().forEach(location -> {
+
+                    locationsRef.child(location.getKey()).removeValue();
+                });
+
+                userRef.removeValue();
+                takenUsernamesRef.child(user.getUid()).removeValue();
+
+                user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "User account deleted.");
+
+                            // Once account is deleted, reboot application to login screen
+                            Intent intent = buildIntent();
+                            ProcessPhoenix.triggerRebirth(getApplicationContext(), intent);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // ...
+            }
+        });
     }
 
     private void changePasswordPrompt() {
