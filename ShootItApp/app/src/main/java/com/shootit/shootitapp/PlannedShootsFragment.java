@@ -2,6 +2,7 @@ package com.shootit.shootitapp;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,24 +91,33 @@ public class PlannedShootsFragment extends Fragment {
         mLocations.child(locationUID).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot locationSnapshot) {
-                // ...
-                location.setAuthor(locationSnapshot.child("author").getValue().toString());
-                location.setTitle(locationSnapshot.child("title").getValue().toString());
-                location.setDescription(locationSnapshot.child("description").getValue().toString());
-                location.setLatitude(locationSnapshot.child("latitude").getValue().toString());
-                location.setLongitude(locationSnapshot.child("longitude").getValue().toString());
-                location.setPosition(new LatLng(
-                        Double.parseDouble(location.getLatitude()),
-                        Double.parseDouble(location.getLongitude())
-                ));
 
-                locationSnapshot.child("images").getChildren().forEach(child -> {
+                try {
 
-                    Uri imageURI = Uri.parse(child.getValue().toString());
-                    List<Uri> images = location.getImages();
-                    images.add(imageURI);
-                    location.setImages(images);
-                });
+                    location.setAuthor(locationSnapshot.child("author").getValue().toString());
+                    location.setTitle(locationSnapshot.child("title").getValue().toString());
+                    location.setDescription(locationSnapshot.child("description").getValue().toString());
+                    location.setLatitude(locationSnapshot.child("latitude").getValue().toString());
+                    location.setLongitude(locationSnapshot.child("longitude").getValue().toString());
+                    location.setPosition(new LatLng(
+                            Double.parseDouble(location.getLatitude()),
+                            Double.parseDouble(location.getLongitude())
+                    ));
+
+                    locationSnapshot.child("images").getChildren().forEach(child -> {
+
+                        Uri imageURI = Uri.parse(child.getValue().toString());
+                        List<Uri> images = location.getImages();
+                        images.add(imageURI);
+                        location.setImages(images);
+                    });
+
+
+
+                } catch (Exception e) {
+
+                    Log.d("Plans", "Failed to generate one or more plans");
+                }
 
                 addPlanToList(plan, location, mShootPlans.child(plan.getKey()));
             }

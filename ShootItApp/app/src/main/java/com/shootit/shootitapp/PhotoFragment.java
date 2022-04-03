@@ -28,6 +28,10 @@ public class PhotoFragment extends Fragment {
     boolean deletable = true;
     boolean deleted = false;
 
+    public PhotoFragment() {
+
+    }
+
     public PhotoFragment(Uri uri, Boolean deletable) {
 
         this.photoUri = uri;

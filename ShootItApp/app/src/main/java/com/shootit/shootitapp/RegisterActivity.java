@@ -3,7 +3,6 @@ package com.shootit.shootitapp;
 import static android.content.ContentValues.TAG;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +18,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -52,8 +50,8 @@ public class RegisterActivity extends AppCompatActivity {
         final Button loginButton = findViewById(R.id.login_button);
 
         usernameInput = findViewById(R.id.usernameInput);
-        emailInput = findViewById(R.id.emailInput);
-        passwordInput = findViewById(R.id.passwordInput);
+        emailInput = findViewById(R.id.emailText);
+        passwordInput = findViewById(R.id.usernameText);
         password2Input = findViewById(R.id.password2Input);
 
         registerButton.setOnClickListener(new View.OnClickListener() {
@@ -130,6 +128,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     mDatabase.child("users").child(userID).child("username").setValue(username);
                     mDatabase.child("users").child(userID).child("email").setValue(email);
+                    mDatabase.child("takenusernames").child(userID).setValue(username);
 
                     launchMainActivity();
                 } else {

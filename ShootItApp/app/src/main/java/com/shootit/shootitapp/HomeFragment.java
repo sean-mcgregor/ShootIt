@@ -2,6 +2,7 @@ package com.shootit.shootitapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -53,6 +55,7 @@ public class HomeFragment extends Fragment {
     private TextView welcomeBanner;
     private TextView weatherText;
     private ImageView weatherImage;
+    private ImageButton profileButton;
     private TextView sunText;
     private LinearLayout weatherContainer;
     private DatabaseReference mUser;
@@ -74,13 +77,28 @@ public class HomeFragment extends Fragment {
         sunText = (TextView) v.findViewById(R.id.sunRiseSetTextView);
         weatherImage = (ImageView) v.findViewById(R.id.weatherImageView);
         weatherContainer = (LinearLayout) v.findViewById(R.id.weatherContainer);
+        profileButton = (ImageButton) v.findViewById(R.id.profileButton);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         mUser = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
 
+        profileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                launchProfileActivity();
+            }
+        });
+
         handleLocationPermissions();
 
         return v;
+    }
+
+    private void launchProfileActivity() {
+
+        Intent ProfileActivityLauncher = new Intent(getContext(), ProfileActivity.class);
+        startActivity(ProfileActivityLauncher);
     }
 
 
@@ -284,7 +302,7 @@ public class HomeFragment extends Fragment {
                     welcomeBanner.setText("Welcome " + String.valueOf(task.getResult().getValue()) + "!");
                 }
             }
-        });;
+        });
     }
 
 }

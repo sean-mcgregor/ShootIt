@@ -65,8 +65,14 @@ public class CreatePlanActivity extends AppCompatActivity{
 
             locationNameTextView.setText(location.getTitle());
 
-            // Add locations first photo to plan preview
-            photoFragment = new PhotoFragment(location.getImages().get(0), false);
+            try {
+
+                // Add locations first photo to plan preview
+                photoFragment = new PhotoFragment(location.getImages().get(0), false);
+            } catch (Exception e) {
+
+                photoFragment = new PhotoFragment();
+            }
 
             // Add photofragment to cardview
             getSupportFragmentManager().beginTransaction().add(R.id.cardView, photoFragment).commit();
