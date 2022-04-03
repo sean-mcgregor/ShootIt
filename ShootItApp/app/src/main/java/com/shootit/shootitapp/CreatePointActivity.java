@@ -104,13 +104,26 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
             @Override
             public void onClick(View view) {
 
-                // Gather information user has provided and create new ShootLocation
-                locationTitle = titleInput.getText().toString();
-                locationDescription = descriptionInput.getText().toString();
+                // Gather information user has provided and create new ShootLocation and remove whitespace
+                locationTitle = titleInput.getText().toString().replaceAll("[\\s|\\t|\\r\\n]+", " ");
+                locationDescription = descriptionInput.getText().toString().replaceAll("[\\s|\\t|\\r\\n]+", " ");
                 locationCoords = newPoint.getPosition();
 
-                ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid(), photosList);
-                pushToDatabase(newLocation);
+                if (CheckInputs.isValidPlaceTitle(locationTitle)) {
+
+                    if (CheckInputs.isValidDescription(locationDescription)) {
+
+                        ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid(), photosList);
+                        pushToDatabase(newLocation);
+                    } else {
+
+                        Toast.makeText(getApplicationContext(), "Description too long or short", Toast.LENGTH_LONG).show();
+
+                    }
+                } else {
+
+                    Toast.makeText(getApplicationContext(), "Title too long or short", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -222,7 +235,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         newPoint = googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(googleMap.getCameraPosition().target.latitude, googleMap.getCameraPosition().target.longitude))
                 .title("New Point")
-                .draggable(true)
+                .draggable(false)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
         // Set onclick listener for the map

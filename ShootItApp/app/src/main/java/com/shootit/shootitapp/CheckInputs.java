@@ -30,11 +30,33 @@ public class CheckInputs {
 
     public static boolean isValidPlaceTitle (String input) {
 
-        return false;
+        Pattern pattern = Pattern.compile("[\\s\\S]{5,30}$");
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.find()){
+
+            Log.d("Description", "isValid");
+            return true;
+        } else {
+
+            Log.d("Description", "invalid");
+            return false;
+        }
     }
 
     public static boolean isValidDescription(String input) {
 
-        return false;
+        Pattern pattern = Pattern.compile("[\\s\\S]{5,400}$");
+        Matcher matcher = pattern.matcher(input);
+
+        if (matcher.find()){
+
+            Log.d("Description", "isValid");
+            return true;
+        } else {
+
+            Log.d("Description", "invalid");
+            return false;
+        }
     }
 }
