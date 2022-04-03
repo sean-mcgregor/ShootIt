@@ -47,7 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseUser user;
     private DatabaseReference userRef, takenUsernamesRef, locationsRef;
-    private Button logoutButton, deleteAccountButton, changePasswordButton, editUsernameButton, editEmailButton, backButton;
+    private Button logoutButton, deleteAccountButton, changePasswordButton, editUsernameButton, editEmailButton, backButton, privacyButton;
 
     TextView emailText, usernameText;
 
@@ -70,6 +70,7 @@ public class ProfileActivity extends AppCompatActivity {
         editUsernameButton = findViewById(R.id.editUsernameButton);
         changePasswordButton = findViewById(R.id.changePasswordButton);
         backButton = findViewById(R.id.back_button);
+        privacyButton = findViewById(R.id.privacy_button);
 
         FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -139,9 +140,44 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        privacyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                showPrivacyDialog();
+            }
+        });
+
         // Populate screen with user-specific content
         updateUI();
         updateUserLocations();
+    }
+
+    private void showPrivacyDialog() {
+
+        // Create alert dialog to confirm deletion
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Your Data in ShootIt!");
+        builder.setMessage("Thank you for using ShootIt!\n" +
+                "ShootIt uses Google Firebase’s authentication system, meaning that the ShootIt! development team and database never has " +
+                "access to sensitive personal data like your password. The data stored by ShootIt includes your email, username, created shoot " +
+                "locations, and plans. Your location is accessed by ShootIt if you provide permission. This location is used solely for the " +
+                "purpose of populating the homepage with weather forecasts for your area. These forecasts are provided by OpenWeatherMap, meaning " +
+                "that the location is passed on to them as a third party, but this location can never be linked or related to you in any manner. " +
+                "Your location is never tracked, logged, or saved in any way. ShootIt does not sell or publish your data.");
+
+        // If user confirms deletion process
+        builder.setPositiveButton("I understand", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+            }
+        });
+
+        // Display prompt to user
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void updateUserLocations() {
