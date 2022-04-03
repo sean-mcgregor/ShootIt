@@ -699,53 +699,59 @@ public class ProfileActivity extends AppCompatActivity {
 
                 String newUsername = input.getText().toString();
 
-                // Get list of taken usernames from firebase
-                takenUsernamesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                if(CheckInputs.isValidUsername(newUsername)) {
 
-                    @Override
-                    public void onDataChange(DataSnapshot usernamesSnapshot) {
+                    // Get list of taken usernames from firebase
+                    takenUsernamesRef.addListenerForSingleValueEvent(new ValueEventListener() {
 
-                        // Assume username available
-                        boolean usernameAvailable = true;
+                        @Override
+                        public void onDataChange(DataSnapshot usernamesSnapshot) {
 
-                        // Iterate through and check all usernames
-                        for (DataSnapshot userName : usernamesSnapshot.getChildren()) {
+                            // Assume username available
+                            boolean usernameAvailable = true;
 
-                            String usernameFromFirebase = userName.getValue().toString();
+                            // Iterate through and check all usernames
+                            for (DataSnapshot userName : usernamesSnapshot.getChildren()) {
 
-                            // If input username is already in use mark it as unavailable
-                            if (newUsername.equals(usernameFromFirebase)) {
+                                String usernameFromFirebase = userName.getValue().toString();
 
-                                usernameAvailable = false;
+                                // If input username is already in use mark it as unavailable
+                                if (newUsername.equals(usernameFromFirebase)) {
+
+                                    usernameAvailable = false;
+                                }
+                            }
+
+                            // If username is available
+                            if (usernameAvailable) {
+
+                                // Update firebase values
+                                userRef.child("username").setValue(newUsername);
+                                takenUsernamesRef.child(user.getUid()).setValue(newUsername);
+
+                                // Confirm that name is changed and update UI
+                                Toast.makeText(getApplicationContext(), "Your username has been changed!", Toast.LENGTH_LONG).show();
+                                updateUI();
+                            } else {
+
+                                // Otherwise provide user with feedback
+                                Toast.makeText(getApplicationContext(), "This username is unavailable!", Toast.LENGTH_LONG).show();
                             }
                         }
 
-                        // If username is available
-                        if (usernameAvailable) {
+                        // Handle firebase snapshot errors
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                            // Update firebase values
-                            userRef.child("username").setValue(newUsername);
-                            takenUsernamesRef.child(user.getUid()).setValue(newUsername);
-
-                            // Confirm that name is changed and update UI
-                            Toast.makeText(getApplicationContext(), "Your username has been changed!", Toast.LENGTH_LONG).show();
-                            updateUI();
-                        } else {
-
-                            // Otherwise provide user with feedback
-                            Toast.makeText(getApplicationContext(), "This username is unavailable!", Toast.LENGTH_LONG).show();
+                            // Provide user feedback
+                            Toast.makeText(getApplicationContext(), "Connection Error", Toast.LENGTH_LONG).show();
+                            Log.d("Username", "snapshot cancelled");
                         }
-                    }
+                    });
+                } else {
 
-                    // Handle firebase snapshot errors
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                        // Provide user feedback
-                        Toast.makeText(getApplicationContext(), "Connection Error", Toast.LENGTH_LONG).show();
-                        Log.d("Username", "snapshot cancelled");
-                    }
-                });
+                    Toast.makeText(getApplicationContext(), "Invalid username format", Toast.LENGTH_LONG).show();
+                }
             }
         });
 

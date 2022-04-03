@@ -61,9 +61,19 @@ public class RegisterActivity extends AppCompatActivity {
                 // Code here executes on main thread after user presses button
                 updateCredentials();
 
-                if( passwordsMatch(getPassword(), getPassword2()) ){
+                if (CheckInputs.isValidUsername(getUsername())) {
 
-                    registerUser(getUsername(), getEmail(), getPassword());
+                    if( passwordsMatch(getPassword(), getPassword2())){
+
+                        registerUser(getUsername(), getEmail(), getPassword());
+                    } else {
+
+                        Toast.makeText(getApplicationContext(), "Passwords do not match", Toast.LENGTH_LONG).show();
+
+                    }
+                } else {
+
+                    Toast.makeText(getApplicationContext(), "Username is not valid", Toast.LENGTH_LONG).show();
                 }
             }
         });
