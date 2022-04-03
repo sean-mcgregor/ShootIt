@@ -2,6 +2,8 @@ package com.shootit.shootitapp;
 
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +59,17 @@ public class CheckInputs {
 
             Log.d("Description", "invalid");
             return false;
+        }
+    }
+
+    public static boolean markerHasMoved(LatLng startPosition, LatLng locationCoords) {
+
+        if (startPosition.latitude == locationCoords.latitude && startPosition.longitude == locationCoords.longitude) {
+
+            return false;
+        } else {
+
+            return true;
         }
     }
 }

@@ -65,7 +65,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
     private EditText titleInput, descriptionInput;
     private Button addPhotoButton, confirmButton, backButton;
     private String locationTitle, locationDescription;
-    private LatLng locationCoords;
+    private LatLng locationCoords, startPosition;
     private List<PhotoFragment> photosList = new ArrayList<PhotoFragment>();
     private GoogleMap googleMap;
 
@@ -113,8 +113,15 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
 
                     if (CheckInputs.isValidDescription(locationDescription)) {
 
-                        ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid(), photosList);
-                        pushToDatabase(newLocation);
+                        if (CheckInputs.markerHasMoved(startPosition, locationCoords)) {
+
+                            ShootLocation newLocation = new ShootLocation(locationTitle, locationDescription, locationCoords, user.getUid(), photosList);
+                            pushToDatabase(newLocation);
+                        } else {
+
+                            Toast.makeText(getApplicationContext(), "Please move the marker to your location", Toast.LENGTH_LONG).show();
+
+                        }
                     } else {
 
                         Toast.makeText(getApplicationContext(), "Description too long or short", Toast.LENGTH_LONG).show();
@@ -238,6 +245,8 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
                 .title("New Point")
                 .draggable(false)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+        startPosition = newPoint.getPosition();
 
         // Set onclick listener for the map
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
