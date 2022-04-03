@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.ColorInt;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
@@ -144,6 +145,7 @@ public class PhotoFragment extends Fragment {
         Button cancelButton = new Button(getContext());
         cancelButton.setBackgroundColor(getResources().getColor(R.color.BACK_BUTTON));
         cancelButton.setText("Back");
+        cancelButton.setTextColor(Color.WHITE);
 
         // If cancel button clicked then destroy dialog
         cancelButton.setOnClickListener(new View.OnClickListener() {
