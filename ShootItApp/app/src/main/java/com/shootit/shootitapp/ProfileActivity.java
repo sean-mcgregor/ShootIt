@@ -46,7 +46,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private FirebaseUser user;
-    private DatabaseReference userRef, takenUsernamesRef,locationsRef;
+    private DatabaseReference userRef, takenUsernamesRef, locationsRef;
     private Button logoutButton, deleteAccountButton, changePasswordButton, editUsernameButton, editEmailButton, backButton;
 
     TextView emailText, usernameText;
@@ -141,6 +141,80 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Populate screen with user-specific content
         updateUI();
+        updateUserLocations();
+    }
+
+    private void updateUserLocations() {
+
+        userRef.child("locations").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot locationsSnapshot) {
+
+
+                locationsSnapshot.getChildren().forEach(location -> {
+
+                    String locationUID = location.getKey();
+                    fetchLocationFromDatabase(locationUID);
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // ...
+            }
+        });
+    }
+
+
+    private void fetchLocationFromDatabase(String locationUID) {
+
+        ShootLocation location = new ShootLocation();
+
+        locationsRef.child(locationUID).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot locationSnapshot) {
+
+                try {
+
+                    location.setAuthor(locationSnapshot.child("author").getValue().toString());
+                    location.setTitle(locationSnapshot.child("title").getValue().toString());
+                    location.setDescription(locationSnapshot.child("description").getValue().toString());
+                    location.setLatitude(locationSnapshot.child("latitude").getValue().toString());
+                    location.setLongitude(locationSnapshot.child("longitude").getValue().toString());
+                    location.setPosition(new LatLng(
+                            Double.parseDouble(location.getLatitude()),
+                            Double.parseDouble(location.getLongitude())
+                    ));
+
+                    locationSnapshot.child("images").getChildren().forEach(child -> {
+
+                        Uri imageURI = Uri.parse(child.getValue().toString());
+                        List<Uri> images = location.getImages();
+                        images.add(imageURI);
+                        location.setImages(images);
+                    });
+
+
+                } catch (Exception e) {
+
+                    Log.d("Plans", "Failed to generate one or more plans");
+                }
+
+                addLocationToList(location, locationsRef.child(locationUID), locationUID);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+
+    private void addLocationToList(ShootLocation location, DatabaseReference locationRef, String locationID) {
+
+        LocationCardView fragment = new LocationCardView(location, locationRef, locationID);
+        getSupportFragmentManager().beginTransaction().add(R.id.locationsContainer, fragment).commit();
     }
 
     private void showConfirmDeleteDialog() {
