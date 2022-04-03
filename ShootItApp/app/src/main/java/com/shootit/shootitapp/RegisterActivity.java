@@ -128,6 +128,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                     mDatabase.child("users").child(userID).child("username").setValue(username);
                     mDatabase.child("users").child(userID).child("email").setValue(email);
+                    mDatabase.child("takenusernames").child(userID).setValue(username);
 
                     launchMainActivity();
                 } else {
