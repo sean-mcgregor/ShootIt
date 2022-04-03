@@ -140,14 +140,13 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
 
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.setOnInfoWindowClickListener(this);
 
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(getContext(), "Info window clicked",
-                Toast.LENGTH_SHORT).show();
 
         launchViewPointActivity((ShootLocation) marker.getTag());
     }

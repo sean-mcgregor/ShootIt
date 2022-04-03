@@ -231,6 +231,7 @@ public class CreatePointActivity extends AppCompatActivity implements OnMapReady
         googleMap = tempMap;
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
 
         newPoint = googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(googleMap.getCameraPosition().target.latitude, googleMap.getCameraPosition().target.longitude))

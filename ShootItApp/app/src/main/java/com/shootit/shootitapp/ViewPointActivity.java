@@ -120,6 +120,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
         googleMap = tempMap;
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location.getPosition(), 15));
 
         newPoint = googleMap.addMarker(new MarkerOptions()
