@@ -3,35 +3,48 @@ package com.shootit.shootitapp;
 import static android.content.ContentValues.TAG;
 
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.ContentProvider;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.jakewharton.processphoenix.ProcessPhoenix;
+
+import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private FirebaseUser user;
-    private DatabaseReference userRef;
-    private Button logoutButton, deleteAccountButton;
+    private DatabaseReference userRef, takenUsernamesRef;
+    private Button logoutButton, deleteAccountButton, editUsernameButton, editEmailButton;
 
     TextView emailText, usernameText;
 
@@ -42,12 +55,15 @@ public class ProfileActivity extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         userRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
+        takenUsernamesRef = FirebaseDatabase.getInstance().getReference().child("takenusernames");
         auth = FirebaseAuth.getInstance();
 
         emailText = findViewById(R.id.emailText);
         usernameText = findViewById(R.id.usernameText);
         logoutButton = findViewById(R.id.logout_button);
         deleteAccountButton = findViewById(R.id.deleteAccountButton);
+        editEmailButton = findViewById(R.id.editEmailButton);
+        editUsernameButton = findViewById(R.id.editUsernameButton);
 
         FirebaseAuth.AuthStateListener authStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -55,7 +71,7 @@ public class ProfileActivity extends AppCompatActivity {
                 if (firebaseAuth.getCurrentUser() == null){
 
                     Log.d("Logged out", "success");
-                    
+
                     // Once signout is complete, reboot application to login screen
                     Intent intent = buildIntent();
                     ProcessPhoenix.triggerRebirth(getApplicationContext(), intent);
@@ -77,9 +93,104 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+        editUsernameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                changeUsernamePrompt();
+            }
+        });
+
+        // Populate screen with user-specific content
         updateUI();
     }
 
+
+    // Dialog window to facilitate user changing their username
+    private void changeUsernamePrompt() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Change Username");
+
+        // Set up the input
+        final EditText input = new EditText(this);
+
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        input.setHint("Enter new username");
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                String newUsername = input.getText().toString();
+
+                // Get list of taken usernames from firebase
+                takenUsernamesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+                    @Override
+                    public void onDataChange(DataSnapshot usernamesSnapshot) {
+
+                        // Assume username available
+                        boolean usernameAvailable = true;
+
+                        // Iterate through and check all usernames
+                        for (DataSnapshot userName : usernamesSnapshot.getChildren()) {
+
+                            String usernameFromFirebase = userName.getValue().toString();
+
+                            // If input username is already in use mark it as unavailable
+                            if (newUsername.equals(usernameFromFirebase)) {
+
+                                usernameAvailable = false;
+                            }
+                        }
+
+                        // If username is available
+                        if (usernameAvailable) {
+
+                            // Update firebase values
+                            userRef.child("username").setValue(newUsername);
+                            takenUsernamesRef.child(user.getUid()).setValue(newUsername);
+
+                            // Confirm that name is changed and update UI
+                            Toast.makeText(getApplicationContext(), "Your username has been changed!", Toast.LENGTH_LONG).show();
+                            updateUI();
+                        } else {
+
+                            // Otherwise provide user with feedback
+                            Toast.makeText(getApplicationContext(), "This username is unavailable!", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    // Handle firebase snapshot errors
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                        // Provide user feedback
+                        Toast.makeText(getApplicationContext(), "Connection Error", Toast.LENGTH_LONG).show();
+                        Log.d("Username", "snapshot cancelled");
+                    }
+                });
+            }
+        });
+
+        // Configure cancel button for dialog window
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        // Display dialog window
+        builder.show();
+    }
+
+
+    // Build intent to restart application from afresh when user logs out
     private Intent buildIntent() {
 
         Intent intent = new Intent(this, LoginActivity.class);
@@ -87,6 +198,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
 
+    // Populate the screen with user-specific values
     private void updateUI() {
 
         StringBuilder emailField = new StringBuilder();
