@@ -204,7 +204,7 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         Log.d("Crash", "Volle failed");
-                        error.printStackTrace();
+                        Toast.makeText(getContext(),"Connection issues. Please try again later.", Toast.LENGTH_LONG).show();
                     }
                 });
 
