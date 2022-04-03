@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -45,7 +46,6 @@ public class PlanCardView extends Fragment {
         // Define view
         View v = inflater.inflate(R.layout.cardview_plan, null);
 
-        photoContainer = new PhotoFragment(location.getImages().get(0), false);
         locationTextView = (TextView) v.findViewById(R.id.titleTextView);
         timeTextView = (TextView) v.findViewById(R.id.timeTextView);
         dateTextView = (TextView) v.findViewById(R.id.dateTextView);
@@ -55,7 +55,15 @@ public class PlanCardView extends Fragment {
             locationTextView.setText(location.getTitle());
         } else {
 
-            locationTextView.setText("Location Data Null");
+            locationTextView.setText("Location Deleted or Inaccessible");
+        }
+
+        try {
+
+            photoContainer = new PhotoFragment(location.getImages().get(0), false);
+        } catch (Exception e){
+
+            photoContainer = new PhotoFragment();
         }
 
         dateTextView.setText(date);
