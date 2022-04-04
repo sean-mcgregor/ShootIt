@@ -8,22 +8,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -39,7 +33,6 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
 
 
     private GoogleMap googleMap;
-    private DatabaseReference mDatabase;
     private DatabaseReference mLocations;
     private String databaseURL = "https://shootit-886f2-default-rtdb.europe-west1.firebasedatabase.app/";
     private List<ShootLocation> locationsFromFirebase = new ArrayList<ShootLocation>();
@@ -52,18 +45,19 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 
-        mDatabase = FirebaseDatabase.getInstance(databaseURL).getReference();
         mLocations = FirebaseDatabase.getInstance(databaseURL).getReference().child("locations");
 
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_map, container, false);
 
+        // Get support map fragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
 
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
         }
 
+        // Fetch shoot locations from firebase
         ValueEventListener locationsListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -140,14 +134,13 @@ public class MapFragment extends Fragment implements GoogleMap.OnInfoWindowClick
 
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.setOnInfoWindowClickListener(this);
 
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(getContext(), "Info window clicked",
-                Toast.LENGTH_SHORT).show();
 
         launchViewPointActivity((ShootLocation) marker.getTag());
     }
