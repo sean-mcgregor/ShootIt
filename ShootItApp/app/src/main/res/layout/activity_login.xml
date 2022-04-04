@@ -7,25 +7,24 @@
     android:background="@color/SAND"
     tools:context=".MainActivity">
 
-    <TextView
+    <ImageView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ShootIt!"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        app:layout_constraintBottom_toTopOf="@id/emailText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.272" />
+        app:srcCompat="@mipmap/shootit_icon"/>
 
     <EditText
-        android:id="@+id/emailInput"
+        android:id="@+id/emailText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Email"
-        android:textColorHint="@color/BROWN"
         android:inputType="textEmailAddress"
+        android:textColorHint="@color/BROWN"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,18 +32,18 @@
         app:layout_constraintVertical_bias="0.5" />
 
     <EditText
-        android:id="@+id/passwordInput"
+        android:id="@+id/usernameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Password"
-        android:textColorHint="@color/BROWN"
         android:inputType="textPassword"
+        android:textColorHint="@color/BROWN"
         app:layout_constraintBottom_toTopOf="@+id/login_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/emailInput" />
+        app:layout_constraintTop_toBottomOf="@+id/emailText" />
 
     <Button
         android:id="@+id/login_button"
@@ -53,10 +52,10 @@
         android:text="Log In"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toTopOf="@+id/register_button"
-        app:layout_constraintEnd_toEndOf="@+id/passwordInput"
+        app:layout_constraintEnd_toEndOf="@+id/usernameText"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/passwordInput"
-        app:layout_constraintTop_toBottomOf="@+id/passwordInput" />
+        app:layout_constraintStart_toStartOf="@+id/usernameText"
+        app:layout_constraintTop_toBottomOf="@+id/usernameText" />
 
     <Button
         android:id="@+id/register_button"
@@ -64,11 +63,11 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:text="Or Register Here"
-        android:textColor="@color/black"
+        android:textColor="@color/BROWN"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/passwordInput"
+        app:layout_constraintEnd_toEndOf="@+id/usernameText"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="@+id/passwordInput"
+        app:layout_constraintStart_toStartOf="@+id/usernameText"
         app:layout_constraintTop_toBottomOf="@+id/login_button"
         app:layout_constraintVertical_bias="0.24" />
 

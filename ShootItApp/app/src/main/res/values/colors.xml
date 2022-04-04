@@ -11,4 +11,5 @@
     <color name="LIGHTGREEN">#71AD90</color>
     <color name="SAND">#FADEC6</color>
     <color name="BROWN">#855432</color>
+    <color name="BACK_BUTTON">#c20000</color>
 </resources>
