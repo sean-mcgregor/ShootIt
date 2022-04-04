@@ -1,24 +1,16 @@
 package com.shootit.shootitapp;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
 
     BottomNavigationView bottomNavigationView;
-    private FirebaseAuth firebaseAuth;
-    private FirebaseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,21 +21,14 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
         bottomNavigationView.setSelectedItemId(R.id.home);
-
-        firebaseAuth= FirebaseAuth.getInstance();
-        user = firebaseAuth.getCurrentUser();
-
-        if (firebaseAuth.getCurrentUser() == null){
-            finish();
-            Intent loginActivityLauncher = new Intent(this, LoginActivity.class);
-            startActivity(loginActivityLauncher);
-        }
     }
 
     HomeFragment homeFragment = new HomeFragment();
     MapFragment mapFragment = new MapFragment();
     PlannedShootsFragment plannedShootsFragment = new PlannedShootsFragment();
 
+
+    // Change between 3 main fragments
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
 

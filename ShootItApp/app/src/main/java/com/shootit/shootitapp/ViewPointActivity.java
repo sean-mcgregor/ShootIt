@@ -50,7 +50,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_point);
 
-        //in SecondActivity
+        // Fetch bundled location
         if(getIntent().getExtras() != null) {
             location = getIntent().getParcelableExtra("location");
         }
@@ -61,10 +61,12 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
         createPlanButton = (Button) findViewById(R.id.createPlanButton);
         imageContainer = (LinearLayout) findViewById(R.id.imageContainer);
 
-        updateWeather(location.getLatitude(), location.getLongitude());
         titleView.setText(location.getTitle());
         descriptionView.setText(location.getDescription());
 
+        updateWeather(location.getLatitude(), location.getLongitude());
+
+        // If back button pressed finish activity
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,6 +75,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
             }
         });
 
+        // Launch create plan activity
         createPlanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,6 +84,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
             }
         });
 
+        // Populate screen with photos of image
         location.getImages().forEach(uri -> {
 
             addPhoto(uri);
@@ -103,6 +107,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
 
+    // Add photo to screen
     private void addPhoto(Uri uri) {
 
         if (uri != null){
@@ -110,16 +115,17 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
             photoToAdd = new PhotoFragment(uri, false);
             getSupportFragmentManager().beginTransaction().add(R.id.imageContainer, photoToAdd).commit();
         }
-
     }
 
 
+    // When map fragment ready, configure
     @Override
     public void onMapReady(GoogleMap tempMap) {
 
         googleMap = tempMap;
         googleMap.getUiSettings().setRotateGesturesEnabled(false);
         googleMap.getUiSettings().setTiltGesturesEnabled(false);
+        googleMap.getUiSettings().setMapToolbarEnabled(false);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location.getPosition(), 15));
 
         newPoint = googleMap.addMarker(new MarkerOptions()
@@ -127,6 +133,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
 
+    // Add weather to screen
     private void updateWeather(String latitude, String longitude) {
 
         String requestURL = buildRequestURL(latitude, longitude);
@@ -141,9 +148,8 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
                         <JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        // the response is already constructed as a JSONObject!
-                        try {
 
+                        try {
                             // Access daily forecast
                             JSONArray daily = response.getJSONArray("daily");
                             addDailyWeather(daily);
@@ -158,7 +164,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("Crash", "Volle failed");
+                        Log.d("Crash", "Volley failed");
                         error.printStackTrace();
                     }
                 });
@@ -167,7 +173,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
         queue.add(jsonRequest);
     }
 
-
+    // Build URL for weather request
     private String buildRequestURL(String latitude, String longitude) {
 
         StringBuilder sb = new StringBuilder();
@@ -182,6 +188,7 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
     }
 
 
+    // Add weather to screen
     private void addDailyWeather(JSONArray daily) throws JSONException {
 
         // Loop through array of days
@@ -196,12 +203,14 @@ public class ViewPointActivity extends AppCompatActivity implements OnMapReadyCa
             // get field value from JSONObject using get() method
             Log.d("DT", day.get("dt").toString());
 
+            // Add fragment to UI
             WeatherFragment dayObject = new WeatherFragment(getIconUri(dayIcon), day.get("dt").toString());
             getSupportFragmentManager().beginTransaction().add(R.id.weatherContainer, dayObject).commit();
         }
     }
 
 
+    // Get resource for weather image
     private Uri getIconUri(String dayIcon) {
 
         StringBuilder iconAddress = new StringBuilder();

@@ -40,6 +40,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
@@ -54,44 +55,45 @@ public class RegisterActivity extends AppCompatActivity {
         passwordInput = findViewById(R.id.usernameText);
         password2Input = findViewById(R.id.password2Input);
 
+        // When register button is clicked
         registerButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
 
-                // Code here executes on main thread after user presses button
+                // Fetch user input
                 updateCredentials();
 
-                if( passwordsMatch(getPassword(), getPassword2()) ){
+                // Validate data formatting
+                if (CheckInputs.isValidUsername(getUsername())) {
 
-                    registerUser(getUsername(), getEmail(), getPassword());
+                    if( passwordsMatch(getPassword(), getPassword2())){
+
+                        // Register new user
+                        registerUser(getUsername(), getEmail(), getPassword());
+                    } else {
+
+                        Toast.makeText(getApplicationContext(), "Passwords do not match", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+
+                    Toast.makeText(getApplicationContext(), "Username is not valid", Toast.LENGTH_LONG).show();
                 }
             }
         });
 
+        // If login button pressed
         loginButton.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
 
-                // Code here executes on main thread after user presses button
+                // Return to login activity
                 launchLoginActivity();
             }
         });
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-
-        if(currentUser != null){
-            System.out.println("User logged in");
-        }
-    }
-
-
+    // Fetches values from input fields
     private void updateCredentials() {
 
         setUsername(RegisterActivity.this.usernameInput.getText().toString());
@@ -100,6 +102,8 @@ public class RegisterActivity extends AppCompatActivity {
         setPassword2(RegisterActivity.this.password2Input.getText().toString());
     }
 
+
+    // Checks if passwords in both input fields match
     private boolean passwordsMatch (String password, String password2) {
 
         if( password.equals(password2)) {
@@ -115,26 +119,32 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
+    // Register new user with firebase using details they have input
     private void registerUser(String username, String email, String password) {
 
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
+
+                // If registration completes
                 if (task.isSuccessful()) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d(TAG, "createUserWithEmail:success");
                     FirebaseUser user = mAuth.getCurrentUser();
                     String userID = user.getUid();
 
+                    // Save info to database
                     mDatabase.child("users").child(userID).child("username").setValue(username);
                     mDatabase.child("users").child(userID).child("email").setValue(email);
                     mDatabase.child("takenusernames").child(userID).setValue(username);
 
+                    // Launch main activity
                     launchMainActivity();
                 } else {
+
                     // If sign in fails, display a message to the user.
                     Log.w(TAG, "createUserWithEmail:failure", task.getException());
-                    Toast.makeText(RegisterActivity.this, "Authentication failed.",
+                    Toast.makeText(getApplicationContext(), "Authentication failed.",
                             Toast.LENGTH_SHORT).show();
                 }
             }
@@ -142,6 +152,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
+    // Launch login activity
     private void launchLoginActivity() {
 
         Intent loginActivityLauncher = new Intent(this, LoginActivity.class);
@@ -149,6 +160,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
+    // Launch main activity
     private void launchMainActivity() {
 
         Intent mainActivityLauncher = new Intent(this, MainActivity.class);
