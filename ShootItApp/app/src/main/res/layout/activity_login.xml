@@ -7,16 +7,15 @@
     android:background="@color/SAND"
     tools:context=".MainActivity">
 
-    <TextView
+    <ImageView
         android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="ShootIt!"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        app:layout_constraintBottom_toTopOf="@id/emailText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.272" />
+        app:srcCompat="@mipmap/shootit_icon"/>
 
     <EditText
         android:id="@+id/emailText"
@@ -24,8 +23,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Email"
-        android:textColorHint="@color/BROWN"
         android:inputType="textEmailAddress"
+        android:textColorHint="@color/BROWN"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,8 +37,8 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="Password"
-        android:textColorHint="@color/BROWN"
         android:inputType="textPassword"
+        android:textColorHint="@color/BROWN"
         app:layout_constraintBottom_toTopOf="@+id/login_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
